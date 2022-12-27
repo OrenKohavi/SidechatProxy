@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">SidechatProxy</string>
+
+    <string name="error_header">Sorry, an error occurred! Please send this message to the developer.</string>
+    <string name="err_placeholder">Unknown Error</string>
+
+    <string name="welcome_big">Welcome to SidechatProxy!</string>
+    <string name="welcome_subtext">Unofficial Sidechat for Android</string>
+
+    <string name="phone_descriptor">Enter your phone number to use Sidechat</string>
+    <string name="phone_field_filler">Phone Number</string>
+    <string name="phone_continue_button">Continue</string>
+
+    <string name="twofactor_text">Please enter the verification code sent to your number</string>
+    <string name="twofactor_field_filler">XXXXXX</string>
+    <string name="twofactor_continue_button">Continue</string>
+</resources>

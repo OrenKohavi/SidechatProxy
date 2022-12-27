@@ -1,6 +1,7 @@
 package com.example.sidechatproxy
 
 import android.util.Log
+import com.example.sidechatproxy.MainActivityDecider.Companion.info_in_memory
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.module.kotlin.*
 import okhttp3.MediaType.Companion.toMediaType
@@ -14,13 +15,33 @@ import java.util.concurrent.FutureTask
 
 class API_Handler {
     companion object {
+        fun phone_verify(twofactor_code: String) {
+            val twofactor_code_upper = twofactor_code.uppercase()
+            val url = "https://api.sidechat.lol/v1/verify_phone_number"
+            val data = mapOf("code" to twofactor_code_upper, "phone_number" to info_in_memory["phone_number"].toString())
+            val response = post(url, data)
+            Log.d("Debug", "Phone Number Verification Response $response")
+            val registration_id = response.getOrDefault("registration_id", false)
+            if (registration_id == false) {
+                throw APIException(response.toString())
+            } else {
+                info_in_memory["registration_id"] = registration_id as String
+            }
+        }
+
         fun login_register(phoneNumber: String) {
             //Send the API call to sidechat
-            var url = "https://api.sidechat.lol/v1/login_register"
-            var data = mapOf("version" to 3, "phone_number" to phoneNumber)
-            var response = post(url, data)
-            if (!response.isEmpty()) {
+            val phoneNumber_with_country_code = "+1" + phoneNumber
+            val url = "https://api.sidechat.lol/v1/login_register"
+            val data = mapOf("version" to 3, "phone_number" to phoneNumber_with_country_code)
+            val response = post(url, data)
+            if (response.isNotEmpty()) {
+                Log.d("Debug", "Response was not empty! Throwing error")
                 throw APIException(response.toString())
+            } else {
+                Log.d("Debug", "Login Register Successful")
+                //Save the phone number for the next steps
+                info_in_memory["phone_number"] = phoneNumber
             }
         }
 
@@ -65,12 +86,13 @@ class API_Handler {
             //Response
             Log.d("Debug_API", "Response Body: $responseBody")
 
-            //we could use jackson if we got a JSON
-            //val objData = mapperAll.readTree(responseBody)
+            //use jackson to turn the json into a map
+            val mapper = jacksonObjectMapper()
+            val objData: Map<String, Any> = mapper.readValue(responseBody, Map::class.java) as Map<String, Any>
 
-            //println("My name is " + objData.get("name").textValue() + ", and I'm a " + objData.get("job").textValue() + ".")
-            //TODO
-            return mapOf<String, Any>("Done" to "yes")
+            Log.d("Debug_API", "Parsed Response is: $objData")
+
+            return objData
         }
     }
 }

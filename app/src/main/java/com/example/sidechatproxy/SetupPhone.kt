@@ -27,12 +27,13 @@ class SetupPhone :  AppCompatActivity(){
             if (checkValidPhone(phoneNumber)) {
                 try {
                     API_Handler.login_register(phoneNumber)
+                    val switchActivityIntent = Intent(this, SetupTwoFactor::class.java)
+                    startActivity(switchActivityIntent)
                 } catch (e : APIException) {
                     MainActivityDecider.latest_errmsg = e.message.toString()
                     val switchActivityIntent = Intent(this, ErrorDisplay::class.java)
                     startActivity(switchActivityIntent)
                 }
-
             } else {
                 Toast.makeText(applicationContext, "Phone Number Invalid!", Toast.LENGTH_SHORT).show()
             }

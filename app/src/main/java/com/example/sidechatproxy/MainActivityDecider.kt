@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 class MainActivityDecider : AppCompatActivity() {
     companion object {
         var latest_errmsg: String = "Unknown Error!"
+        var info_in_memory: MutableMap<String, String> = mutableMapOf()
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

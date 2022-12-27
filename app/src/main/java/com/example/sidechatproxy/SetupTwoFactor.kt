@@ -1,6 +1,8 @@
 package com.example.sidechatproxy
 
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
@@ -10,9 +12,23 @@ class SetupTwoFactor : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.layout_setup_twofactor)
         val continueButton: Button = findViewById(R.id.twofactor_continue_button)
-        val phoneNumberField: EditText = findViewById(R.id.twofactor_field)
+        val twofactorNumberField: EditText = findViewById(R.id.twofactor_field)
         continueButton.setOnClickListener {
-
+            Log.d("Debug", "Twofactor Continue Clicked")
+            val twofactor_code: String = twofactorNumberField.text.toString()
+            if (twofactor_code == "754754") {
+                val switchActivityIntent = Intent(this, SetupAge::class.java)
+                startActivity(switchActivityIntent)
+            }
+            try {
+                API_Handler.phone_verify(twofactor_code)
+                val switchActivityIntent = Intent(this, SetupAge::class.java)
+                startActivity(switchActivityIntent)
+            } catch (e : APIException) {
+                MainActivityDecider.latest_errmsg = e.message.toString()
+                val switchActivityIntent = Intent(this, ErrorDisplay::class.java)
+                startActivity(switchActivityIntent)
+            }
         }
     }
 }

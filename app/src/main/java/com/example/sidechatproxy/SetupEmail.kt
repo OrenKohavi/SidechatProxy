@@ -8,21 +8,19 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 
-class SetupAge : AppCompatActivity() {
+class SetupEmail : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.layout_setup_age)
-        val continueButton: Button = findViewById(R.id.age_continue_button)
-        val ageField: EditText = findViewById(R.id.age_field)
+        setContentView(R.layout.layout_setup_email)
+        val continueButton: Button = findViewById(R.id.email_continue_button)
+        val emailField: EditText = findViewById(R.id.email_field)
         continueButton.setOnClickListener {
-            Log.d("Debug", "Age Continue Clicked")
-            val age: String = ageField.text.toString()
+            Log.d("Debug", "Email Continue Clicked")
+            val email: String = emailField.text.toString()
             try {
-                API_Handler.complete_registration(this, age)
-                val switchActivityIntent = Intent(this, SetupEmail::class.java)
+                API_Handler.register_email(email)
+                val switchActivityIntent = Intent(this, SetupWaitForEmailVerification::class.java)
                 startActivity(switchActivityIntent)
-            } catch (e : java.lang.NumberFormatException) {
-                Toast.makeText(applicationContext, "Invalid Number", Toast.LENGTH_SHORT).show()
             } catch (e : APIException) {
                 MainActivityDecider.latest_errmsg = e.message.toString()
                 val switchActivityIntent = Intent(this, ErrorDisplay::class.java)

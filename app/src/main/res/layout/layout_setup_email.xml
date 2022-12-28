@@ -2,7 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/layout_setup_age"
+    android:id="@+id/layout_setup_email"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingLeft="@dimen/activity_horizontal_margin"
@@ -11,12 +11,12 @@
     android:paddingBottom="@dimen/activity_vertical_margin">
 
     <TextView
-        android:id="@+id/age_text"
+        android:id="@+id/email_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="20sp"
         android:gravity="center"
-        android:text="@string/age_text"
+        android:text="@string/email_text"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -24,30 +24,30 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
-        android:id="@+id/age_field"
-        android:layout_width="wrap_content"
+        android:id="@+id/email_field"
+        android:layout_width="match_parent"
         android:layout_height="60sp"
-        android:layout_marginHorizontal="40sp"
+        android:layout_marginHorizontal="20sp"
         android:layout_marginTop="20sp"
         android:autofillHints="notApplicable"
-        android:hint="@string/age_field_filler"
-        android:inputType="number"
+        android:hint="@string/email_field_filler"
+        android:inputType="textWebEmailAddress"
         android:minHeight="48sp"
-        android:paddingHorizontal="30dp"
+        android:paddingHorizontal="15dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/age_text"
+        app:layout_constraintTop_toBottomOf="@+id/email_text"
         tools:ignore="TextContrastCheck" />
 
     <Button
-        android:id="@+id/age_continue_button"
+        android:id="@+id/email_continue_button"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
         android:layout_marginTop="30dp"
         android:paddingVertical="20sp"
         android:layout_marginHorizontal="30sp"
-        android:text="@string/age_continue_button"
-        app:layout_constraintTop_toBottomOf="@+id/age_field"
+        android:text="@string/email_continue_button"
+        app:layout_constraintTop_toBottomOf="@+id/email_field"
         tools:ignore="TextContrastCheck" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

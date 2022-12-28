@@ -7,6 +7,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.example.sidechatproxy.MainActivityDecider.Companion.debug_mode
 
 
 class SetupPhone :  AppCompatActivity(){
@@ -20,9 +21,11 @@ class SetupPhone :  AppCompatActivity(){
             Log.d("Debug", "Phone Continue Clicked")
             //Check if the phone number is valid
             val phoneNumber: String = phoneNumberField.text.toString()
-            if (phoneNumber == "75477547") {
-                val switchActivityIntent = Intent(this, SetupTwoFactor::class.java)
+            if (phoneNumber == "75477547" && debug_mode) {
+                Toast.makeText(applicationContext, "Skipping PhoneNumber -- Secret Code", Toast.LENGTH_SHORT).show()
+                val switchActivityIntent = Intent(this, PostsMain::class.java)
                 startActivity(switchActivityIntent)
+                return@setOnClickListener
             }
             if (checkValidPhone(phoneNumber)) {
                 try {

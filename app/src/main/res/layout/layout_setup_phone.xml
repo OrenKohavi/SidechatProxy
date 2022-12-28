@@ -52,7 +52,7 @@
         android:layout_width="match_parent"
         android:layout_height="70dp"
         android:layout_marginTop="10dp"
-        android:autofillHints="phoneNumber"
+        android:autofillHints="phoneNumberDevice"
         android:ems="10"
         android:hint="@string/phone_field_filler"
         android:inputType="phone"

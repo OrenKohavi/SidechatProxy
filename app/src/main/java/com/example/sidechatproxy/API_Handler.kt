@@ -81,7 +81,7 @@ class API_Handler {
             }
         }
 
-        fun get_posts(group_id: String, type: String): Array<Map<String, String>> {
+        fun get_posts(group_id: String, type: String): List<Map<String, Any>> {
             val url = "https://api.sidechat.lol/v1/posts?group_id=$group_id&type=$type"
             val token = info_in_memory["token"] as String
             val response = get(url, token)
@@ -89,7 +89,15 @@ class API_Handler {
             if (post_list !is ArrayList<*>) {
                 throw APIException("post_list is not an ArrayList! Response: $response")
             }
-
+            var new_post_list: MutableList<Map<String, Any>> = mutableListOf()
+            for (post in post_list) {
+                if (post !is Map<*, *>) {
+                    throw APIException("Post was not a map! Post contents: $post, response: $response")
+                }
+                @Suppress("UNCHECKED_CAST") //Suppressing is okay because JSON is guaranteed to have string keys
+                new_post_list.add(post as Map<String, Any>)
+            }
+            return new_post_list
         }
 
         fun check_email_verification(): Boolean {

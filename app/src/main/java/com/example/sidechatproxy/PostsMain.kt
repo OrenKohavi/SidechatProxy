@@ -32,6 +32,15 @@ class PostsMain : AppCompatActivity() {
             return
         }
         //User and Group are loaded, so we can fetch posts!
-        get_all_posts()
+        try {
+            get_all_posts()
+        } catch (e : APIException) {
+            StartupScreen.latest_errmsg = e.message.toString()
+            val switchActivityIntent = Intent(this, ErrorDisplay::class.java)
+            startActivity(switchActivityIntent)
+        }
+        //Setup a tabbed view or something? idk
+
+
     }
 }

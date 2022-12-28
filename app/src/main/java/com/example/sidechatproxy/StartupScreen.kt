@@ -1,9 +1,11 @@
 package com.example.sidechatproxy
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.text.method.TextKeyListener.clear
 import android.util.Log
 import android.widget.Button
 import android.widget.Toast
@@ -13,13 +15,13 @@ import androidx.appcompat.app.AppCompatActivity
 class StartupScreen : AppCompatActivity() {
     companion object {
         //Probably bad practice, but I'm just using this companion object to store 'globals'
-        const val debug_mode: Boolean = true
         var latest_errmsg: String = "Unknown Error!"
         var info_in_memory: MutableMap<String, Any> = mutableMapOf()
+        @SuppressLint("StaticFieldLeak")
         lateinit var startup_activity_context: Activity
         // ^ Yes, this is a memory leak because the StartupScreen will never get deallocated
         // ^ I'm still using it because it's easy,
-        // ^ and because the startup activity is simple and so it's no big deal
+        // ^ and the startup activity is simple and so it's no big deal (not too much memory leaking)
 
         fun longterm_put(k: String, v: String) {
             val sharedPref = startup_activity_context.getPreferences(Context.MODE_PRIVATE)
@@ -40,6 +42,7 @@ class StartupScreen : AppCompatActivity() {
         //Setup stuff
         Log.d("Debug", "App Started")
         startup_activity_context = this
+        Log.d("Debug", "Set Startup Context")
         info_in_memory["user_stored"] = false
         info_in_memory["group_stored"] = false
         info_in_memory["posts_stored"] = false

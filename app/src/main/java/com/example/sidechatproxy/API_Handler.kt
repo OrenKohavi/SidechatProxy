@@ -1,7 +1,6 @@
 package com.example.sidechatproxy
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.util.Log
 import com.example.sidechatproxy.StartupScreen.Companion.info_in_memory
 import com.example.sidechatproxy.StartupScreen.Companion.longterm_put
@@ -15,6 +14,8 @@ import java.net.URL
 import android.provider.Settings
 import com.example.sidechatproxy.StartupScreen.Companion.longterm_get
 import com.example.sidechatproxy.StartupScreen.Companion.startup_activity_context
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.security.MessageDigest
 import java.util.concurrent.Callable
 import java.util.concurrent.FutureTask
@@ -31,17 +32,64 @@ class API_Handler {
             info_in_memory["group_stored"] = true
             info_in_memory["group_color"] = group["color"] as String
             info_in_memory["group_name"] = group["name"] as String
+            info_in_memory["group_id"] = group["id"] as String
+            info_in_memory["group_icon_url"] = group["icon_url"] as String
+            longterm_put("group_id", group["id"] as String)
         }
 
-        private fun parse_posts(hot: Map<String, Any>, new: Map<String, Any>, top: Map<String, Any>) {
-            info_in_memory["posts_stored"] = true
-            info_in_memory["posts_hot"] = hot
-            info_in_memory["posts_new"] = new
-            info_in_memory["posts_top"] = top
+        fun get_user_and_group() {
+            Log.d("Debug_API", "updating user and group")
+            val group_id = longterm_get("group_id") ?: throw APIException("Stored group_id was null!")
+            val token: String = longterm_get("token") ?: throw APIException("Stored token was null!")
+            info_in_memory["token"] = token //For future API calls, so that they don't need to use longterm memory
+            Log.d("Debug_API", "Set token in memory to: $token")
+            val response = get(
+                "https://api.sidechat.lol/v1/updates?group_id=$group_id",
+                token
+            )
+            val group: Map<String, Any>
+            val user: Map<String, Any>
+            try {
+                @Suppress("UNCHECKED_CAST")
+                group = response["group"] as Map<String, Any>
+                @Suppress("UNCHECKED_CAST")
+                user = response["user"] as Map<String, Any>
+            } catch (e : Exception) {
+                throw APIException("Could not parse group/user in update_func\n$response")
+            }
+            parse_group(group)
+            parse_user(user)
+        }
+
+
+        fun get_all_posts() {
+            val group_id = info_in_memory["group_id"] as String
+            //Still blocks, but at least now it's 3 paralell API calls rather than serially one at a time
+            runBlocking {
+                launch {
+                    val hot_posts = get_posts(group_id, "hot")
+                    info_in_memory["hot_posts"] = hot_posts
+                }
+                launch {
+                    val new_posts = get_posts(group_id, "recent") //Weird, but their API wants the 'recent' keyword
+                    info_in_memory["new_posts"] = new_posts
+                }
+                launch {
+                    val top_posts = get_posts(group_id, "top")
+                    info_in_memory["top_posts"] = top_posts
+                }
+            }
         }
 
         fun get_posts(group_id: String, type: String): Array<Map<String, String>> {
-            return emptyArray()
+            val url = "https://api.sidechat.lol/v1/posts?group_id=$group_id&type=$type"
+            val token = info_in_memory["token"] as String
+            val response = get(url, token)
+            val post_list = (response["posts"] ?: throw APIException("Post List is Null! Response: $response ||| $info_in_memory"))
+            if (post_list !is ArrayList<*>) {
+                throw APIException("post_list is not an ArrayList! Response: $response")
+            }
+
         }
 
         fun check_email_verification(): Boolean {
@@ -184,7 +232,19 @@ class API_Handler {
             }
         }
 
-        fun get(plaintext_url: String, bearer_token: String?): Map<String, Any> {
+        fun get(url: String, bearer_token: String?): Map<String, Any> {
+            val get_callable = Callable {
+                return@Callable _get(url, bearer_token)
+            }
+            val future_callable = FutureTask(get_callable)
+            val thread = Thread(future_callable)
+            thread.start()
+            //TODO: Figure out how to make this API call non-blocking (same issue as with post)
+            val result = future_callable.get() //Blocks until the request is done :(
+            return result
+        }
+
+        fun _get(plaintext_url: String, bearer_token: String?): Map<String, Any> {
             val client = OkHttpClient()
             val url = URL(plaintext_url)
 

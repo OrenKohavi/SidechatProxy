@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import android.widget.EditText
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 
 class SetupEmail : AppCompatActivity() {
@@ -22,7 +21,7 @@ class SetupEmail : AppCompatActivity() {
                 val switchActivityIntent = Intent(this, SetupWaitForEmailVerification::class.java)
                 startActivity(switchActivityIntent)
             } catch (e : APIException) {
-                MainActivityDecider.latest_errmsg = e.message.toString()
+                StartupScreen.latest_errmsg = e.message.toString()
                 val switchActivityIntent = Intent(this, ErrorDisplay::class.java)
                 startActivity(switchActivityIntent)
             }

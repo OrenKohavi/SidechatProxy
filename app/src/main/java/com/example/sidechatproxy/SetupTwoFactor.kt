@@ -5,9 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import android.widget.EditText
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.example.sidechatproxy.MainActivityDecider.Companion.debug_mode
 
 class SetupTwoFactor : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,7 +17,7 @@ class SetupTwoFactor : AppCompatActivity() {
             Log.d("Debug", "Twofactor Continue Clicked")
             val twofactor_code: String = twofactorNumberField.text.toString()
             try {
-                val needs_additional_setup = API_Handler.phone_verify(this, twofactor_code)
+                val needs_additional_setup = API_Handler.phone_verify(twofactor_code)
                 if (needs_additional_setup) {
                     val switchActivityIntent = Intent(this, SetupAge::class.java)
                     startActivity(switchActivityIntent)
@@ -28,7 +26,7 @@ class SetupTwoFactor : AppCompatActivity() {
                     startActivity(switchActivityIntent)
                 }
             } catch (e : APIException) {
-                MainActivityDecider.latest_errmsg = e.message.toString()
+                StartupScreen.latest_errmsg = e.message.toString()
                 val switchActivityIntent = Intent(this, ErrorDisplay::class.java)
                 startActivity(switchActivityIntent)
             }

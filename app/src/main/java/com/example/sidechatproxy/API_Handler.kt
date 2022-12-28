@@ -3,8 +3,8 @@ package com.example.sidechatproxy
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.util.Log
-import com.example.sidechatproxy.MainActivityDecider.Companion.info_in_memory
-import com.example.sidechatproxy.MainActivityDecider.Companion.longterm_put
+import com.example.sidechatproxy.StartupScreen.Companion.info_in_memory
+import com.example.sidechatproxy.StartupScreen.Companion.longterm_put
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.module.kotlin.*
 import okhttp3.MediaType.Companion.toMediaType
@@ -13,7 +13,8 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.net.URL
 import android.provider.Settings
-import com.example.sidechatproxy.MainActivityDecider.Companion.longterm_get
+import com.example.sidechatproxy.StartupScreen.Companion.longterm_get
+import com.example.sidechatproxy.StartupScreen.Companion.startup_activity_context
 import java.security.MessageDigest
 import java.util.concurrent.Callable
 import java.util.concurrent.FutureTask
@@ -43,7 +44,7 @@ class API_Handler {
             return emptyArray()
         }
 
-        fun check_email_verification(email: String): Boolean {
+        fun check_email_verification(): Boolean {
             val token: String = info_in_memory["token"] as String
             val get_response = get("https://api.sidechat.lol/v1/users/check_email_verified", token)
             if (get_response.isEmpty()) {
@@ -58,7 +59,9 @@ class API_Handler {
                 val user: Map<String, Any>
                 val group: Map<String, Any>
                 try {
+                    @Suppress("UNCHECKED_CAST")
                     user = response_json["user"] as Map<String, Any>
+                    @Suppress("UNCHECKED_CAST")
                     group = response_json["group"] as Map<String, Any>
                 } catch (e: java.lang.Exception) {
                     Log.d("Debug", "Error converting to Map: $response_json")
@@ -86,7 +89,7 @@ class API_Handler {
             }
         }
 
-        fun complete_registration(ctx: Activity, age: String) {
+        fun complete_registration(age: String) {
             val age_number = age.toInt()
             val url = "https://api.sidechat.lol/v1/complete_registration"
             val data = mapOf(
@@ -103,9 +106,9 @@ class API_Handler {
                 throw APIException(response.toString())
             } else {
                 info_in_memory["token"] = token as String
-                longterm_put(ctx, "token", token)
+                longterm_put("token", token)
                 //Need to register device token
-                val device_id = getDeviceID(ctx)
+                val device_id = getDeviceID()
                 info_in_memory["device_id"] = device_id
                 //Need to use the token as a bearer token
                 val device_token_url = "https://api.sidechat.lol/v1/register_device_token"
@@ -122,7 +125,7 @@ class API_Handler {
             }
         }
 
-        fun phone_verify(ctx: Activity, twofactor_code: String): Boolean {
+        fun phone_verify(twofactor_code: String): Boolean {
             val twofactor_code_upper = twofactor_code.uppercase()
             val url = "https://api.sidechat.lol/v1/verify_phone_number"
             val data = mapOf("code" to twofactor_code_upper, "phone_number" to info_in_memory["phone_number"].toString())
@@ -145,13 +148,22 @@ class API_Handler {
                     Log.d("Debug_API", "Content of logged_in_user is: $logged_in_user")
                     throw APIException("Logged in user incorrect format: $logged_in_user")
                 }
-                val user: Map<String, Any> = logged_in_user["user"] as Map<String, Any>
-                val group: Map<String, Any> = logged_in_user["group"] as Map<String, Any>
+                val user: Map<String, Any>
+                val group: Map<String, Any>
+                try {
+                    @Suppress("UNCHECKED_CAST")
+                    user = logged_in_user["user"] as Map<String, Any>
+                    @Suppress("UNCHECKED_CAST")
+                    group = logged_in_user["group"] as Map<String, Any>
+                } catch (e: java.lang.Exception) {
+                    Log.d("Debug", "logged_in_user - Error converting to Map: $logged_in_user")
+                    throw APIException("logged_in_user - Error converting to map: $logged_in_user")
+                }
                 val token: String = logged_in_user["token"] as String
                 Log.d("Debug_API", "Values retrieved! Token is: $token, group is $group, user is $user")
                 parse_user(user)
                 parse_group(group)
-                longterm_put(ctx, "token", token)
+                longterm_put("token", token)
                 return false //No additional setup required
             }
         }
@@ -197,6 +209,7 @@ class API_Handler {
             Log.d("Debug_API", "Response Body: $responseBody")
 
             val mapper = jacksonObjectMapper()
+            @Suppress("UNCHECKED_CAST") //Safe to assume string keys, because JSON can only have string keys
             val objData: Map<String, Any> = mapper.readValue(responseBody, Map::class.java) as Map<String, Any>
 
             Log.d("Debug_API", "Parsed Response is: $objData")
@@ -205,11 +218,11 @@ class API_Handler {
         }
 
         //Version of the post method with no token
-        fun post(url: String, args: Map<String, Any>): Map<String, Any> {
+        private fun post(url: String, args: Map<String, Any>): Map<String, Any> {
             return post(url, args, null)
         }
 
-        fun post(url: String, args: Map<String, Any>, bearer_token: String?): Map<String, Any> {
+        private fun post(url: String, args: Map<String, Any>, bearer_token: String?): Map<String, Any> {
             val post_callable = Callable {
                 return@Callable _post(url, args, bearer_token)
             }
@@ -222,7 +235,7 @@ class API_Handler {
             return result
         }
 
-        fun _post(plaintext_url : String, args : Map<String, Any>, bearer_token: String?): Map<String, Any> {
+        private fun _post(plaintext_url : String, args : Map<String, Any>, bearer_token: String?): Map<String, Any> {
             val client = OkHttpClient()
             val url = URL(plaintext_url)
 
@@ -262,6 +275,7 @@ class API_Handler {
 
             //use jackson to turn the json into a map
             val mapper = jacksonObjectMapper()
+            @Suppress("UNCHECKED_CAST") //Safe to assume string keys, because JSON can only have string keys
             val objData: Map<String, Any> = mapper.readValue(responseBody, Map::class.java) as Map<String, Any>
 
             Log.d("Debug_API", "Parsed Response is: $objData")
@@ -270,8 +284,8 @@ class API_Handler {
         }
 
         @SuppressLint("HardwareIds") //Potentially not recommended to use ANDROID_ID here, but whatever
-        fun getDeviceID(ctx: Activity): String {
-            val existing_id = longterm_get(ctx, "device_id")
+        fun getDeviceID(): String {
+            val existing_id = longterm_get("device_id")
             if (existing_id != null) {
                 //We already have an ID!
                 return existing_id
@@ -280,11 +294,11 @@ class API_Handler {
             // Android IDs are 64 bits
             // So I'll just use a SHA256 hash to extend to 256 bits
             fun ByteArray.toHexString() = joinToString("") { "%02x".format(it) }
-            val androidID = Settings.Secure.getString(ctx.contentResolver,Settings.Secure.ANDROID_ID)
+            val androidID = Settings.Secure.getString(startup_activity_context.contentResolver,Settings.Secure.ANDROID_ID)
             val digest = MessageDigest.getInstance("SHA-256")
             val hash = digest.digest(androidID.toByteArray())
             val hash_string = hash.toHexString()
-            longterm_put(ctx, "device_id", hash_string)
+            longterm_put("device_id", hash_string)
             return hash_string
         }
     }

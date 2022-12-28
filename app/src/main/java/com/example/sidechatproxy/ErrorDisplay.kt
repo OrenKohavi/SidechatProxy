@@ -12,6 +12,6 @@ class ErrorDisplay : AppCompatActivity() {
         setContentView(R.layout.layout_error_display)
         Log.d("Debug", "Created Error Display")
         val textView = findViewById<TextView>(R.id.error_content)
-        textView.text = MainActivityDecider.latest_errmsg
+        textView.text = StartupScreen.latest_errmsg
     }
 }

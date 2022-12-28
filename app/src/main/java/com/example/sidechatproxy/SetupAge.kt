@@ -18,13 +18,13 @@ class SetupAge : AppCompatActivity() {
             Log.d("Debug", "Age Continue Clicked")
             val age: String = ageField.text.toString()
             try {
-                API_Handler.complete_registration(this, age)
+                API_Handler.complete_registration(age)
                 val switchActivityIntent = Intent(this, SetupEmail::class.java)
                 startActivity(switchActivityIntent)
             } catch (e : java.lang.NumberFormatException) {
                 Toast.makeText(applicationContext, "Invalid Number", Toast.LENGTH_SHORT).show()
             } catch (e : APIException) {
-                MainActivityDecider.latest_errmsg = e.message.toString()
+                StartupScreen.latest_errmsg = e.message.toString()
                 val switchActivityIntent = Intent(this, ErrorDisplay::class.java)
                 startActivity(switchActivityIntent)
             }

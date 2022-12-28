@@ -7,7 +7,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.example.sidechatproxy.MainActivityDecider.Companion.debug_mode
+import com.example.sidechatproxy.StartupScreen.Companion.debug_mode
 
 
 class SetupPhone :  AppCompatActivity(){
@@ -33,7 +33,7 @@ class SetupPhone :  AppCompatActivity(){
                     val switchActivityIntent = Intent(this, SetupTwoFactor::class.java)
                     startActivity(switchActivityIntent)
                 } catch (e : APIException) {
-                    MainActivityDecider.latest_errmsg = e.message.toString()
+                    StartupScreen.latest_errmsg = e.message.toString()
                     val switchActivityIntent = Intent(this, ErrorDisplay::class.java)
                     startActivity(switchActivityIntent)
                 }
@@ -44,6 +44,6 @@ class SetupPhone :  AppCompatActivity(){
     }
 
     private fun checkValidPhone(phoneNumber: String): Boolean {
-        return phoneNumber.length > 8;
+        return phoneNumber.length > 8
     }
 }

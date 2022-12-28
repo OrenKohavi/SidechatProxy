@@ -13,10 +13,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.SidechatProxy"
-        tools:targetApi="31">
+        tools:targetApi="33">
 
         <activity
-            android:name=".MainActivityDecider"
+            android:name=".StartupScreen"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -24,10 +24,15 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".ErrorDisplay" android:parentActivityName=".SetupPhone"/>
-        <activity android:name=".SetupPhone" android:parentActivityName=".SetupPhone"/>
+        <activity android:name=".ErrorDisplay" android:parentActivityName=".StartupScreen"/>
+        <activity android:name=".SetupPhone" android:parentActivityName=".StartupScreen"/>
         <activity android:name=".SetupTwoFactor" android:parentActivityName=".SetupPhone"/>
-        <activity android:name=".SetupAge"/>
+        <activity android:name=".SetupAge" android:parentActivityName=".SetupTwoFactor"/>
+        <activity android:name=".SetupEmail" android:parentActivityName=".SetupAge"/>
+        <activity android:name=".SetupWaitForEmailVerification" android:parentActivityName=".SetupEmail"/>
+
+        <activity android:name=".PostsMain"/>
+        <activity android:name=".FAQ"/>
     </application>
 
 </manifest>

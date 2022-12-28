@@ -4,4 +4,5 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="activity_vertical_margin_large">48dp</dimen>
     <dimen name="activity_vertical_margin_huge">96dp</dimen>
+    <dimen name="activity_vertical_margin_ultrahuge">192dp</dimen>
 </resources>

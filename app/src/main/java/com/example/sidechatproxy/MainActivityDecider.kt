@@ -30,6 +30,9 @@ class MainActivityDecider : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d("Debug", "App Started")
+        info_in_memory["user_stored"] = false
+        info_in_memory["group_stored"] = false
+        info_in_memory["posts_stored"] = false
         if (true) { //For now, just true.
             // Eventually, it should decide whether to do setup every time or not
             val switchActivityIntent = Intent(this, SetupPhone::class.java)

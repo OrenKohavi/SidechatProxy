@@ -21,12 +21,57 @@ import java.util.concurrent.FutureTask
 
 class API_Handler {
     companion object {
-        fun check_email_verification(email: String) {
+        private fun parse_user(user: Map<String, Any>) {
+            info_in_memory["user_stored"] = true
+            info_in_memory["user_id"] = user["id"] as String
+        }
 
+        private fun parse_group(group: Map<String, Any>) {
+            info_in_memory["group_stored"] = true
+            info_in_memory["group_color"] = group["color"] as String
+            info_in_memory["group_name"] = group["name"] as String
+        }
+
+        private fun parse_posts(hot: Map<String, Any>, new: Map<String, Any>, top: Map<String, Any>) {
+            info_in_memory["posts_stored"] = true
+            info_in_memory["posts_hot"] = hot
+            info_in_memory["posts_new"] = new
+            info_in_memory["posts_top"] = top
+        }
+
+        fun get_posts(group_id: String, type: String): Array<Map<String, String>> {
+            return emptyArray()
+        }
+
+        fun check_email_verification(email: String): Boolean {
+            val token: String = info_in_memory["token"] as String
+            val get_response = get("https://api.sidechat.lol/v1/users/check_email_verified", token)
+            if (get_response.isEmpty()) {
+                return false
+            } else {
+                val response_json = get_response["verified_email_updates_response"]
+                if (response_json !is Map<*, *>) {
+                    Log.d("Debug_API", "response_json exists but is not a map!")
+                    Log.d("Debug_API", "Content of response_json is: $response_json")
+                    throw APIException("response_json incorrect format: $response_json")
+                }
+                val user: Map<String, Any>
+                val group: Map<String, Any>
+                try {
+                    user = response_json["user"] as Map<String, Any>
+                    group = response_json["group"] as Map<String, Any>
+                } catch (e: java.lang.Exception) {
+                    Log.d("Debug", "Error converting to Map: $response_json")
+                    throw APIException("Error converting to map: $response_json")
+                }
+                parse_user(user)
+                parse_group(group)
+                return true
+            }
         }
 
         fun register_email(email: String) {
-            val token: String? = info_in_memory["token"] as String?
+            val token: String = info_in_memory["token"] as String
             val get_response = get("https://api.sidechat.lol/v1/login_type?email=$email", token)
             if (get_response.isNotEmpty()) {
                 throw APIException("email get falied: $get_response")
@@ -59,8 +104,6 @@ class API_Handler {
             } else {
                 info_in_memory["token"] = token as String
                 longterm_put(ctx, "token", token)
-                //TODO: Potentially more info in this response that I can extract
-
                 //Need to register device token
                 val device_id = getDeviceID(ctx)
                 info_in_memory["device_id"] = device_id
@@ -102,16 +145,13 @@ class API_Handler {
                     Log.d("Debug_API", "Content of logged_in_user is: $logged_in_user")
                     throw APIException("Logged in user incorrect format: $logged_in_user")
                 }
-                val user: Map<*,*> = logged_in_user["user"] as Map<*, *>
-                val group: Map<*,*> = logged_in_user["group"] as Map<*, *>
+                val user: Map<String, Any> = logged_in_user["user"] as Map<String, Any>
+                val group: Map<String, Any> = logged_in_user["group"] as Map<String, Any>
                 val token: String = logged_in_user["token"] as String
                 Log.d("Debug_API", "Values retrieved! Token is: $token, group is $group, user is $user")
-                //Store these into memory
-                info_in_memory["user"] = user
-                info_in_memory["group"] = group
-                info_in_memory["token"] = token
+                parse_user(user)
+                parse_group(group)
                 longterm_put(ctx, "token", token)
-                //TODO: There's probably more info that I can extract here (i.e. device ID)
                 return false //No additional setup required
             }
         }

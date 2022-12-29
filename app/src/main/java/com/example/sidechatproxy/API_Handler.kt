@@ -1,6 +1,8 @@
 package com.example.sidechatproxy
 
 import android.annotation.SuppressLint
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import com.example.sidechatproxy.StartupScreen.Companion.info_in_memory
 import com.example.sidechatproxy.StartupScreen.Companion.longterm_put
@@ -26,15 +28,18 @@ class API_Handler {
         private fun parse_user(user: Map<String, Any>) {
             info_in_memory["user_stored"] = true
             info_in_memory["user_id"] = user["id"] as String
+            longterm_put("user_id", user["id"] as String)
+            Log.d("Debug", "Longterm Stored user_id: " + user["id"] as String)
         }
 
         private fun parse_group(group: Map<String, Any>) {
-            info_in_memory["group_stored"] = true
+            info_in_memory["group_id_stored"] = true
             info_in_memory["group_color"] = group["color"] as String
             info_in_memory["group_name"] = group["name"] as String
             info_in_memory["group_id"] = group["id"] as String
             info_in_memory["group_icon_url"] = group["icon_url"] as String
             longterm_put("group_id", group["id"] as String)
+            Log.d("Debug", "Longterm Stored group_id: " + group["id"] as String)
         }
 
         fun get_user_and_group() {
@@ -43,59 +48,70 @@ class API_Handler {
             val token: String = longterm_get("token") ?: throw APIException("Stored token was null!")
             info_in_memory["token"] = token //For future API calls, so that they don't need to use longterm memory
             Log.d("Debug_API", "Set token in memory to: $token")
-            val response = get(
+            val response_future = get_returnfuture(
                 "https://api.sidechat.lol/v1/updates?group_id=$group_id",
                 token
             )
-            val group: Map<String, Any>
-            val user: Map<String, Any>
-            try {
-                @Suppress("UNCHECKED_CAST")
-                group = response["group"] as Map<String, Any>
-                @Suppress("UNCHECKED_CAST")
-                user = response["user"] as Map<String, Any>
-            } catch (e : Exception) {
-                throw APIException("Could not parse group/user in update_func\n$response")
-            }
-            parse_group(group)
-            parse_user(user)
+            var group: Map<String, Any>
+            var user: Map<String, Any>
+            val mainHandler = Handler(Looper.getMainLooper())
+            mainHandler.post(object : Runnable {
+                override fun run() {
+                    val response = response_future.get()
+                    try {
+                        @Suppress("UNCHECKED_CAST")
+                        group = response["group"] as Map<String, Any>
+                        @Suppress("UNCHECKED_CAST")
+                        user = response["user"] as Map<String, Any>
+                    } catch (e : Exception) {
+                        throw APIException("Could not parse group/user in update_func\n$response")
+                    }
+                    parse_group(group)
+                    parse_user(user)
+                }
+            }) //Delay by 50ms to hopefully make the UI more responsive
+
         }
 
 
         fun get_all_posts() {
+            Log.d("Debug", "Getting all posts")
             val group_id = info_in_memory["group_id"] as String
-            //Still blocks, but at least now it's 3 paralell API calls rather than serially one at a time
-            runBlocking {
-                launch {
-                    val hot_posts = get_posts(group_id, "hot")
-                    info_in_memory["hot_posts"] = hot_posts
-                }
-                launch {
-                    val new_posts = get_posts(group_id, "recent") //Weird, but their API wants the 'recent' keyword
-                    info_in_memory["new_posts"] = new_posts
-                }
-                launch {
-                    val top_posts = get_posts(group_id, "top")
-                    info_in_memory["top_posts"] = top_posts
-                }
-            }
+            val token = (info_in_memory["token"] ?: throw APIException("Token is null! Memory: $info_in_memory")) as String
+            info_in_memory["posts_stored"] = true
+
+            val hot_future = get_returnfuture("https://api.sidechat.lol/v1/posts?group_id=$group_id&type=hot", token)
+            val new_future = get_returnfuture("https://api.sidechat.lol/v1/posts?group_id=$group_id&type=recent", token)
+            val top_future = get_returnfuture("https://api.sidechat.lol/v1/posts?group_id=$group_id&type=top", token)
+            //Hopefully all three GET requests are running simultaneously
+            info_in_memory["hot_posts"] = get_posts(hot_future)
+            info_in_memory["hot_posts"] = get_posts(new_future)
+            info_in_memory["hot_posts"] = get_posts(top_future)
+            //This is still basically networking on the main thread (boo), but at least hopefully it's not three sequential calls
+            Log.d("Debug", "Finished getting all posts")
         }
 
-        fun get_posts(group_id: String, type: String): List<Map<String, Any>> {
-            val url = "https://api.sidechat.lol/v1/posts?group_id=$group_id&type=$type"
-            val token = info_in_memory["token"] as String
-            val response = get(url, token)
+        fun get_posts(response_future: FutureTask<Map<String, Any>>): List<Post> {
+            val response = response_future.get()
             val post_list = (response["posts"] ?: throw APIException("Post List is Null! Response: $response ||| $info_in_memory"))
             if (post_list !is ArrayList<*>) {
                 throw APIException("post_list is not an ArrayList! Response: $response")
             }
-            var new_post_list: MutableList<Map<String, Any>> = mutableListOf()
+            var new_post_list: MutableList<Post> = mutableListOf()
             for (post in post_list) {
                 if (post !is Map<*, *>) {
                     throw APIException("Post was not a map! Post contents: $post, response: $response")
                 }
                 @Suppress("UNCHECKED_CAST") //Suppressing is okay because JSON is guaranteed to have string keys
-                new_post_list.add(post as Map<String, Any>)
+                val body: String = post["text"] as String
+                val num_upvotes: Number = post["vote_total"] as Number
+                val num_comments: Number = post["comment_count"] as Number
+                val image_url: String? = if ((post["assets"] as List<*>).isNotEmpty()) {
+                    ((post["assets"] as List<*>)[0] as Map<*,*>).getOrDefault("url", null) as String?
+                } else {
+                    null //No image
+                }
+                new_post_list.add(Post(body, num_upvotes, image_url, num_comments))
             }
             return new_post_list
         }
@@ -163,6 +179,7 @@ class API_Handler {
             } else {
                 info_in_memory["token"] = token as String
                 longterm_put("token", token)
+                Log.d("Debug_API", "Stored token into memory and longterm")
                 //Need to register device token
                 val device_id = getDeviceID()
                 info_in_memory["device_id"] = device_id
@@ -220,6 +237,7 @@ class API_Handler {
                 parse_user(user)
                 parse_group(group)
                 longterm_put("token", token)
+                info_in_memory["token"] = token
                 return false //No additional setup required
             }
         }
@@ -240,15 +258,22 @@ class API_Handler {
             }
         }
 
-        fun get(url: String, bearer_token: String?): Map<String, Any> {
+        fun get_returnfuture(url: String, bearer_token: String?): FutureTask<Map<String, Any>> {
+            Log.d("Debug_API", "Submitting GET request to $url")
             val get_callable = Callable {
                 return@Callable _get(url, bearer_token)
             }
             val future_callable = FutureTask(get_callable)
             val thread = Thread(future_callable)
             thread.start()
+            return future_callable
+        }
+
+        fun get(url: String, bearer_token: String?): Map<String, Any> {
             //TODO: Figure out how to make this API call non-blocking (same issue as with post)
+            val future_callable = get_returnfuture(url, bearer_token)
             val result = future_callable.get() //Blocks until the request is done :(
+            Log.d("Debug_API", "Get Request complete to $url")
             return result
         }
 

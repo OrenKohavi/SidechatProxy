@@ -43,13 +43,31 @@ class StartupScreen : AppCompatActivity() {
         Log.d("Debug", "App Started")
         startup_activity_context = this
         Log.d("Debug", "Set Startup Context")
-        info_in_memory["user_stored"] = false
-        info_in_memory["group_stored"] = false
+        //Attempt to retrieve user_id
+        val user_id: String? = longterm_get("user_id")
+        if (user_id != null){
+            info_in_memory["user_stored"] = true
+            info_in_memory["user_id"] = user_id
+        } else {
+            info_in_memory["user_stored"] = false
+        }
+        val group_id: String? = longterm_get("group_id")
+        if (group_id != null){
+            info_in_memory["group_id_stored"] = true
+            info_in_memory["group_id"] = group_id
+        } else {
+            info_in_memory["group_id_stored"] = false
+        }
         info_in_memory["posts_stored"] = false
 
         //Attempt to retrieve token from memory to see if login exists
-        val token = longterm_get("token")
-        info_in_memory["login_complete"] = (token != null)
+        val token: String? = longterm_get("token")
+        if (token != null){
+            info_in_memory["login_complete"] = true
+            info_in_memory["token"] = token
+        } else {
+            info_in_memory["login_complete"] = false
+        }
 
         val getStartedButton: Button = findViewById(R.id.get_started_button)
         val aboutButton: Button = findViewById(R.id.about_button)

@@ -22,7 +22,7 @@ import com.google.android.material.tabs.TabLayoutMediator
 
 class MyFragmentStateAdapter(fragment: FragmentActivity) : FragmentStateAdapter(fragment) {
     companion object {
-        val page_to_category: Map<Int, String> = mapOf(0 to "hot", 1 to "new", 2 to "top")
+        val page_to_category: Map<Int, String> = mapOf(0 to "hot", 1 to "recent", 2 to "top")
     }
 
     override fun getItemCount() = 3 //Hardcoded 3 pages (Hot, New, Top)

@@ -74,7 +74,7 @@ class API_Handler {
         fun get_all_posts() {
             Log.d("Debug", "Getting all posts")
             val group_id = group_id!!
-            val token = (token ?: throw APIException("Token is null! Memory: $memory_strings | $memory_posts")) as String
+            val token = (token ?: throw APIException("Token is null! Memory: $memory_strings | $memory_posts"))
 
             val hot_future = get_returnfuture("https://api.sidechat.lol/v1/posts?group_id=$group_id&type=hot", token)
             val new_future = get_returnfuture("https://api.sidechat.lol/v1/posts?group_id=$group_id&type=recent", token)
@@ -83,6 +83,7 @@ class API_Handler {
             memory_posts["hot"] = get_posts(hot_future)
             memory_posts["recent"] = get_posts(new_future)
             memory_posts["top"] = get_posts(top_future)
+            Log.d("Debug", "Stored hot, recent, and top posts into memory")
             //This is still basically networking on the main thread (boo), but at least hopefully it's not three sequential calls
             Log.d("Debug", "Finished getting all posts")
         }
@@ -102,12 +103,14 @@ class API_Handler {
                 val body: String = post["text"] as String
                 val num_upvotes: Number = post["vote_total"] as Number
                 val num_comments: Number = post["comment_count"] as Number
+                val created_at: String = post["created_at"] as String
+                //TODO maybe parse the time here?
                 val image_url: String? = if ((post["assets"] as List<*>).isNotEmpty()) {
                     ((post["assets"] as List<*>)[0] as Map<*,*>).getOrDefault("url", null) as String?
                 } else {
                     null //No image
                 }
-                new_post_list.add(Post(body, num_upvotes, image_url, num_comments))
+                new_post_list.add(Post(body, num_upvotes, image_url, num_comments, created_at))
             }
             return new_post_list
         }

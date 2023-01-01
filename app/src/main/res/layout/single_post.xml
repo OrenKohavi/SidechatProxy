@@ -37,6 +37,7 @@
         android:layout_margin="0sp"
         android:layout_marginEnd="10sp"
         android:contentDescription="@string/downvote_button_alt_text"
+        android:minWidth="48dp"
         android:paddingHorizontal="8sp"
         android:paddingVertical="12sp"
         android:src="@drawable/upvote_arrow"
@@ -50,12 +51,13 @@
         android:layout_margin="0sp"
         android:layout_marginEnd="100sp"
         android:contentDescription="@string/upvote_button_alt_text"
+        android:minWidth="48dp"
         android:paddingHorizontal="8sp"
         android:paddingVertical="12sp"
         android:src="@drawable/downvote_arrow"
         app:layout_constraintEnd_toEndOf="@+id/upvote_button"
         app:layout_constraintStart_toStartOf="@+id/upvote_button"
-        app:layout_constraintTop_toBottomOf="@+id/upvotes" />
+        app:layout_constraintTop_toBottomOf="@+id/vote_counter" />
 
     <ImageView
         android:id="@+id/post_image"
@@ -68,7 +70,7 @@
         tools:srcCompat="@tools:sample/avatars" />
 
     <TextView
-        android:id="@+id/upvotes"
+        android:id="@+id/vote_counter"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
@@ -78,6 +80,16 @@
         app:layout_constraintEnd_toEndOf="@+id/upvote_button"
         app:layout_constraintStart_toStartOf="@+id/upvote_button"
         app:layout_constraintTop_toBottomOf="@+id/upvote_button" />
+
+    <ImageButton
+        android:id="@+id/comment_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/comment_button_alt_text"
+        android:src="@drawable/comments_icon"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/downvote_button" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

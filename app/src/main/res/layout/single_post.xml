@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="5sp"
+    android:layout_marginVertical="5sp"
+    android:background="@color/white">
+
+    <TextView
+        android:id="@+id/post_body"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="5sp"
+        android:layout_marginTop="8dp"
+        android:text="Post Body Placeholder"
+        android:textColor="@color/black"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toStartOf="@+id/upvote_button"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/post_info"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Some Time Ago"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="@+id/imageView"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/imageView"
+        app:layout_constraintTop_toBottomOf="@+id/imageView" />
+
+    <ImageButton
+        android:id="@+id/upvote_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="0sp"
+        android:paddingHorizontal="4sp"
+        android:paddingVertical="10sp"
+        android:src="@drawable/upvote_arrow"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/downvote_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="4sp"
+        android:paddingVertical="10sp"
+        android:layout_margin="0sp"
+        android:src="@drawable/downvote_arrow"
+        android:contentDescription="@string/upvote_button_alt_text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/upvote_button" />
+
+    <ImageView
+        android:id="@+id/post_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/downvote_button_alt_text"
+        app:layout_constraintEnd_toEndOf="@+id/post_body"
+        app:layout_constraintStart_toStartOf="@+id/post_body"
+        app:layout_constraintTop_toBottomOf="@+id/post_body"
+        tools:srcCompat="@tools:sample/avatars" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

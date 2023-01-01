@@ -114,4 +114,7 @@
         "For example, position the FAB to one side of stream of a cards so the FAB won’t interfere "
         "when a user tries to pick up one of cards.\n\n"
     </string>
+    <string name="upvote_button_alt_text">Upvote Button</string>
+    <string name="downvote_button_alt_text">Downvote Button</string>
+    <string name="loading_text">Loading...</string>
 </resources>

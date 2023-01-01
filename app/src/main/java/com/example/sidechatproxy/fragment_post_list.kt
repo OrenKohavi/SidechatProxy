@@ -1,11 +1,13 @@
 package com.example.sidechatproxy
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import com.example.sidechatproxy.StartupScreen.Companion.info_in_memory
 
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 private const val CATEGORY = "hot_posts"
@@ -31,8 +33,9 @@ class fragment_post_list : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_post_list, container, false)
-        val textView = view.findViewById<TextView>(R.id.placeholder)
-        textView.text = "Viewing: $category"
+        //val textView = view.findViewById<TextView>(R.id.placeholder)
+        //@Suppress("UNCHECKED_CAST")
+        //textView.text = (info_in_memory[category + "_posts"] as List<Post>)[0].body
         return view
     }
 

@@ -14,8 +14,12 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.net.URL
 import android.provider.Settings
+import com.example.sidechatproxy.StartupScreen.Companion.group_id
 import com.example.sidechatproxy.StartupScreen.Companion.longterm_get
+import com.example.sidechatproxy.StartupScreen.Companion.memory_strings
 import com.example.sidechatproxy.StartupScreen.Companion.startup_activity_context
+import com.example.sidechatproxy.StartupScreen.Companion.token
+import com.example.sidechatproxy.StartupScreen.Companion.user_id
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.security.MessageDigest
@@ -26,27 +30,26 @@ import java.util.concurrent.FutureTask
 class API_Handler {
     companion object {
         private fun parse_user(user: Map<String, Any>) {
-            info_in_memory["user_stored"] = true
-            info_in_memory["user_id"] = user["id"] as String
-            longterm_put("user_id", user["id"] as String)
-            Log.d("Debug", "Longterm Stored user_id: " + user["id"] as String)
+            user_id = user["id"] as String
+            longterm_put("user_id", user_id!!)
+            Log.d("Debug", "Longterm Stored user_id: $user_id")
         }
 
         private fun parse_group(group: Map<String, Any>) {
-            info_in_memory["group_id_stored"] = true
+            group_id = group["id"] as String
             info_in_memory["group_color"] = group["color"] as String
             info_in_memory["group_name"] = group["name"] as String
             info_in_memory["group_id"] = group["id"] as String
             info_in_memory["group_icon_url"] = group["icon_url"] as String
-            longterm_put("group_id", group["id"] as String)
-            Log.d("Debug", "Longterm Stored group_id: " + group["id"] as String)
+            longterm_put("group_id", group_id!!)
+            Log.d("Debug", "Longterm Stored group_id: $group_id")
         }
 
         fun get_user_and_group() {
             Log.d("Debug_API", "updating user and group")
             val group_id = longterm_get("group_id") ?: throw APIException("Stored group_id was null!")
-            val token: String = longterm_get("token") ?: throw APIException("Stored token was null!")
-            info_in_memory["token"] = token //For future API calls, so that they don't need to use longterm memory
+            val _token: String = longterm_get("token") ?: throw APIException("Stored token was null!")
+            token = _token //For future API calls, so that they don't need to use longterm memory
             Log.d("Debug_API", "Set token in memory to: $token")
             val response_future = get_returnfuture(
                 "https://api.sidechat.lol/v1/updates?group_id=$group_id",
@@ -54,46 +57,40 @@ class API_Handler {
             )
             var group: Map<String, Any>
             var user: Map<String, Any>
-            val mainHandler = Handler(Looper.getMainLooper())
-            mainHandler.post(object : Runnable {
-                override fun run() {
-                    val response = response_future.get()
-                    try {
-                        @Suppress("UNCHECKED_CAST")
-                        group = response["group"] as Map<String, Any>
-                        @Suppress("UNCHECKED_CAST")
-                        user = response["user"] as Map<String, Any>
-                    } catch (e : Exception) {
-                        throw APIException("Could not parse group/user in update_func\n$response")
-                    }
-                    parse_group(group)
-                    parse_user(user)
-                }
-            }) //Delay by 50ms to hopefully make the UI more responsive
-
+            val response = response_future.get()
+            try {
+                @Suppress("UNCHECKED_CAST")
+                group = response["group"] as Map<String, Any>
+                @Suppress("UNCHECKED_CAST")
+                user = response["user"] as Map<String, Any>
+            } catch (e : Exception) {
+                throw APIException("Could not parse group/user in update_func\n$response")
+            }
+            parse_group(group)
+            parse_user(user)
         }
 
 
         fun get_all_posts() {
             Log.d("Debug", "Getting all posts")
-            val group_id = info_in_memory["group_id"] as String
-            val token = (info_in_memory["token"] ?: throw APIException("Token is null! Memory: $info_in_memory")) as String
-            info_in_memory["posts_stored"] = true
+            val group_id = group_id!!
+            val token = (token ?: throw APIException("Token is null! Memory: $info_in_memory")) as String
 
             val hot_future = get_returnfuture("https://api.sidechat.lol/v1/posts?group_id=$group_id&type=hot", token)
             val new_future = get_returnfuture("https://api.sidechat.lol/v1/posts?group_id=$group_id&type=recent", token)
             val top_future = get_returnfuture("https://api.sidechat.lol/v1/posts?group_id=$group_id&type=top", token)
             //Hopefully all three GET requests are running simultaneously
             info_in_memory["hot_posts"] = get_posts(hot_future)
-            info_in_memory["hot_posts"] = get_posts(new_future)
-            info_in_memory["hot_posts"] = get_posts(top_future)
+            info_in_memory["new_posts"] = get_posts(new_future)
+            info_in_memory["top_posts"] = get_posts(top_future)
+            info_in_memory["posts_stored"] = true
             //This is still basically networking on the main thread (boo), but at least hopefully it's not three sequential calls
             Log.d("Debug", "Finished getting all posts")
         }
 
         fun get_posts(response_future: FutureTask<Map<String, Any>>): List<Post> {
             val response = response_future.get()
-            val post_list = (response["posts"] ?: throw APIException("Post List is Null! Response: $response ||| $info_in_memory"))
+            val post_list = (response["posts"] ?: throw APIException("Post List is Null! Response: $response ||| $memory_strings"))
             if (post_list !is ArrayList<*>) {
                 throw APIException("post_list is not an ArrayList! Response: $response")
             }
@@ -117,7 +114,6 @@ class API_Handler {
         }
 
         fun check_email_verification(): Boolean {
-            val token: String = info_in_memory["token"] as String
             val get_response = get("https://api.sidechat.lol/v1/users/check_email_verified", token)
             if (get_response.isEmpty()) {
                 return false
@@ -146,7 +142,6 @@ class API_Handler {
         }
 
         fun register_email(email: String) {
-            val token: String = info_in_memory["token"] as String
             val get_response = get("https://api.sidechat.lol/v1/login_type?email=$email", token)
             if (get_response.isNotEmpty()) {
                 throw APIException("email get falied: $get_response")
@@ -164,25 +159,25 @@ class API_Handler {
         fun complete_registration(age: String) {
             val age_number = age.toInt()
             val url = "https://api.sidechat.lol/v1/complete_registration"
-            val data = mapOf(
-                "registration_id" to info_in_memory["registration_id"].toString(),
+            val data: Map<String, Any> = mapOf(
+                "registration_id" to memory_strings["registration_id"]!!,
                 "age" to age_number,
             )
             val response = post(url, data)
             Log.d("Debug_API", "Registration Completion Response $response")
-            val token = response.getOrDefault("token", false)
+            val _token = response.getOrDefault("token", false)
             val user = response.getOrDefault("user", false)
             Log.d("Debug_API", "Token is: $token")
             Log.d("Debug_API", "User is: $user")
-            if (token == false) {
+            if (_token == false) {
                 throw APIException(response.toString())
             } else {
-                info_in_memory["token"] = token as String
-                longterm_put("token", token)
+                token = _token as String
+                longterm_put("token", token!!)
                 Log.d("Debug_API", "Stored token into memory and longterm")
                 //Need to register device token
                 val device_id = getDeviceID()
-                info_in_memory["device_id"] = device_id
+                memory_strings["device_id"] = device_id
                 //Need to use the token as a bearer token
                 val device_token_url = "https://api.sidechat.lol/v1/register_device_token"
                 val device_token_data = mapOf(
@@ -190,7 +185,7 @@ class API_Handler {
                     "bundle_id" to "com.flowerave.sidechat",
                     "device_token" to device_id,
                 )
-                val device_token_response = post(device_token_url, device_token_data, info_in_memory["token"].toString())
+                val device_token_response = post(device_token_url, device_token_data, token.toString())
                 Log.d("Debug_API", "device_token_response was: $device_token_response")
                 if (device_token_response.isNotEmpty()) {
                     throw APIException(device_token_response.toString())
@@ -201,7 +196,7 @@ class API_Handler {
         fun phone_verify(twofactor_code: String): Boolean {
             val twofactor_code_upper = twofactor_code.uppercase()
             val url = "https://api.sidechat.lol/v1/verify_phone_number"
-            val data = mapOf("code" to twofactor_code_upper, "phone_number" to info_in_memory["phone_number"].toString())
+            val data = mapOf("code" to twofactor_code_upper, "phone_number" to memory_strings["phone_number"].toString())
             val response = post(url, data)
             Log.d("Debug_API", "Phone Number Verification Response $response")
             //If this is a new user, the response will include a registration_id and setup must continue
@@ -212,7 +207,7 @@ class API_Handler {
                 if (registration_id == false) {
                     throw APIException(response.toString())
                 } else {
-                    info_in_memory["registration_id"] = registration_id as String
+                    memory_strings["registration_id"] = registration_id as String
                 }
                 return true //Additional setup required, go to SetupAge
             } else {
@@ -232,12 +227,11 @@ class API_Handler {
                     Log.d("Debug", "logged_in_user - Error converting to Map: $logged_in_user")
                     throw APIException("logged_in_user - Error converting to map: $logged_in_user")
                 }
-                val token: String = logged_in_user["token"] as String
+                token = logged_in_user["token"] as String
                 Log.d("Debug_API", "Values retrieved! Token is: $token, group is $group, user is $user")
                 parse_user(user)
                 parse_group(group)
-                longterm_put("token", token)
-                info_in_memory["token"] = token
+                longterm_put("token", token!!)
                 return false //No additional setup required
             }
         }
@@ -254,7 +248,7 @@ class API_Handler {
             } else {
                 Log.d("Debug", "Login Register Successful")
                 //Save the phone number for the next steps
-                info_in_memory["phone_number"] = phoneNumber_with_country_code
+                memory_strings["phone_number"] = phoneNumber_with_country_code
             }
         }
 

@@ -9,7 +9,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 
 
-class SetupPhone :  AppCompatActivity(){
+class SetupPhone : AppCompatActivity(){
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d("Debug", "SetupPhone Instance Created")
         super.onCreate(savedInstanceState)

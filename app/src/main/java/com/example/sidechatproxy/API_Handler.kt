@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import com.example.sidechatproxy.StartupScreen.Companion.info_in_memory
 import com.example.sidechatproxy.StartupScreen.Companion.longterm_put
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.module.kotlin.*
@@ -16,6 +15,7 @@ import java.net.URL
 import android.provider.Settings
 import com.example.sidechatproxy.StartupScreen.Companion.group_id
 import com.example.sidechatproxy.StartupScreen.Companion.longterm_get
+import com.example.sidechatproxy.StartupScreen.Companion.memory_posts
 import com.example.sidechatproxy.StartupScreen.Companion.memory_strings
 import com.example.sidechatproxy.StartupScreen.Companion.startup_activity_context
 import com.example.sidechatproxy.StartupScreen.Companion.token
@@ -37,10 +37,10 @@ class API_Handler {
 
         private fun parse_group(group: Map<String, Any>) {
             group_id = group["id"] as String
-            info_in_memory["group_color"] = group["color"] as String
-            info_in_memory["group_name"] = group["name"] as String
-            info_in_memory["group_id"] = group["id"] as String
-            info_in_memory["group_icon_url"] = group["icon_url"] as String
+            memory_strings["group_color"] = group["color"] as String
+            memory_strings["group_name"] = group["name"] as String
+            memory_strings["group_id"] = group["id"] as String
+            memory_strings["group_icon_url"] = group["icon_url"] as String
             longterm_put("group_id", group_id!!)
             Log.d("Debug", "Longterm Stored group_id: $group_id")
         }
@@ -74,16 +74,15 @@ class API_Handler {
         fun get_all_posts() {
             Log.d("Debug", "Getting all posts")
             val group_id = group_id!!
-            val token = (token ?: throw APIException("Token is null! Memory: $info_in_memory")) as String
+            val token = (token ?: throw APIException("Token is null! Memory: $memory_strings | $memory_posts")) as String
 
             val hot_future = get_returnfuture("https://api.sidechat.lol/v1/posts?group_id=$group_id&type=hot", token)
             val new_future = get_returnfuture("https://api.sidechat.lol/v1/posts?group_id=$group_id&type=recent", token)
             val top_future = get_returnfuture("https://api.sidechat.lol/v1/posts?group_id=$group_id&type=top", token)
             //Hopefully all three GET requests are running simultaneously
-            info_in_memory["hot_posts"] = get_posts(hot_future)
-            info_in_memory["new_posts"] = get_posts(new_future)
-            info_in_memory["top_posts"] = get_posts(top_future)
-            info_in_memory["posts_stored"] = true
+            memory_posts["hot"] = get_posts(hot_future)
+            memory_posts["recent"] = get_posts(new_future)
+            memory_posts["top"] = get_posts(top_future)
             //This is still basically networking on the main thread (boo), but at least hopefully it's not three sequential calls
             Log.d("Debug", "Finished getting all posts")
         }

@@ -6,8 +6,6 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
-import com.example.sidechatproxy.StartupScreen.Companion.info_in_memory
 
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 private const val CATEGORY = "hot_posts"

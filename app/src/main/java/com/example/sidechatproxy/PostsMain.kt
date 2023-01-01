@@ -11,8 +11,11 @@ import androidx.viewpager2.widget.ViewPager2
 import com.example.sidechatproxy.API_Handler.Companion.get_all_posts
 import com.example.sidechatproxy.API_Handler.Companion.get_user_and_group
 import com.example.sidechatproxy.MyFragmentStateAdapter.Companion.page_to_category
-import com.example.sidechatproxy.StartupScreen.Companion.info_in_memory
+import com.example.sidechatproxy.StartupScreen.Companion.group_id
 import com.example.sidechatproxy.StartupScreen.Companion.latest_errmsg
+import com.example.sidechatproxy.StartupScreen.Companion.memory_posts
+import com.example.sidechatproxy.StartupScreen.Companion.token
+import com.example.sidechatproxy.StartupScreen.Companion.user_id
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 
@@ -35,8 +38,8 @@ class PostsMain : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.layout_posts_main)
         //Make sure that the user, group, and posts are all loaded
-        if (!(info_in_memory["user_stored"] as Boolean)) {
-            //Load the user (and group, because they come as part of the same API response)
+        if (user_id == null || group_id == null || token == null) {
+            //Load the user (and group_id, because they come as part of the same API response)
             try {
                 get_user_and_group()
             } catch (e : APIException) {
@@ -45,19 +48,12 @@ class PostsMain : AppCompatActivity() {
                 startActivity(switchActivityIntent)
             }
         }
-        if (!(info_in_memory["group_id_stored"] as Boolean)) {
-            Log.d("Debug", "Group_id was not loaded in PostsMain -- It should be")
-            latest_errmsg = "Group_id not loaded in PostsMain:\n memory data: $info_in_memory"
-            val switchActivityIntent = Intent(this, ErrorDisplay::class.java)
-            startActivity(switchActivityIntent)
-            return
-        }
         //User and Group are loaded, so we can fetch posts!
-        if (!(info_in_memory["posts_stored"] as Boolean)) {
+        if (memory_posts["hot"] == null || memory_posts["recent"] == null || memory_posts["top"] == null) {
             try {
                 get_all_posts()
             } catch (e: APIException) {
-                StartupScreen.latest_errmsg = e.message.toString()
+                latest_errmsg = e.message.toString()
                 val switchActivityIntent = Intent(this, ErrorDisplay::class.java)
                 startActivity(switchActivityIntent)
             }

@@ -18,7 +18,7 @@ class StartupScreen : AppCompatActivity() {
         var latest_errmsg: String = "Unknown Error!"
         var loading_complete: Boolean = true
         @Suppress("StaticFieldLeak")
-        var next_screen: Context? = null
+        var next_screen: Class<*>? = null
         //var info_in_memory: MutableMap<String, Any> = mutableMapOf()
         var user_id: String? = null
         var group_id: String? = null

@@ -1,8 +1,6 @@
 package com.example.sidechatproxy
 
 import android.annotation.SuppressLint
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import com.example.sidechatproxy.StartupScreen.Companion.longterm_put
 import com.fasterxml.jackson.core.JsonProcessingException
@@ -20,8 +18,6 @@ import com.example.sidechatproxy.StartupScreen.Companion.memory_strings
 import com.example.sidechatproxy.StartupScreen.Companion.startup_activity_context
 import com.example.sidechatproxy.StartupScreen.Companion.token
 import com.example.sidechatproxy.StartupScreen.Companion.user_id
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import java.security.MessageDigest
 import java.util.concurrent.Callable
 import java.util.concurrent.FutureTask
@@ -55,8 +51,8 @@ class API_Handler {
                 "https://api.sidechat.lol/v1/updates?group_id=$group_id",
                 token
             )
-            var group: Map<String, Any>
-            var user: Map<String, Any>
+            val group: Map<String, Any>
+            val user: Map<String, Any>
             val response = response_future.get()
             try {
                 @Suppress("UNCHECKED_CAST")
@@ -94,7 +90,7 @@ class API_Handler {
             if (post_list !is ArrayList<*>) {
                 throw APIException("post_list is not an ArrayList! Response: $response")
             }
-            var new_post_list: MutableList<Post> = mutableListOf()
+            val new_post_list: MutableList<Post> = mutableListOf()
             for (post in post_list) {
                 if (post !is Map<*, *>) {
                     throw APIException("Post was not a map! Post contents: $post, response: $response")
@@ -254,7 +250,7 @@ class API_Handler {
             }
         }
 
-        fun get_returnfuture(url: String, bearer_token: String?): FutureTask<Map<String, Any>> {
+        private fun get_returnfuture(url: String, bearer_token: String?): FutureTask<Map<String, Any>> {
             Log.d("Debug_API", "Submitting GET request to $url")
             val get_callable = Callable {
                 return@Callable _get(url, bearer_token)
@@ -273,7 +269,7 @@ class API_Handler {
             return result
         }
 
-        fun _get(plaintext_url: String, bearer_token: String?): Map<String, Any> {
+        private fun _get(plaintext_url: String, bearer_token: String?): Map<String, Any> {
             val client = OkHttpClient()
             val url = URL(plaintext_url)
 

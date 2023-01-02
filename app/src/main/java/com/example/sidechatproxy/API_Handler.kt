@@ -261,17 +261,10 @@ class API_Handler {
                     val bitmap = BitmapFactory.decodeStream(inputStream)
                     imageView.post {
                         imageView.setImageBitmap(bitmap)
+                        imageView.scaleType = ImageView.ScaleType.CENTER_INSIDE
                     }
                 }
             })
-        }
-
-        fun get_image(url: String, bearer_token: String): Any {
-            val c = FutureTask { _get(url, bearer_token) }
-            Thread(c).start()
-            val result = c.get()
-            Log.d("Debug", "Image result is: $result")
-            return result
         }
 
         private fun get_returnfuture(url: String, bearer_token: String?): FutureTask<Map<String, Any>> {

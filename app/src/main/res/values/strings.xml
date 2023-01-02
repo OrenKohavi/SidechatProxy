@@ -23,8 +23,9 @@
     <string name="hot_tab_text">Hot</string>
     <string name="new_tab_text">New</string>
     <string name="top_tab_text">Top</string>
-    <string name="upvote_button_alt_text">Upvote Button</string>
-    <string name="downvote_button_alt_text">Downvote Button</string>
+    <string name="upvote_button_alt_text">Upvote</string>
+    <string name="downvote_button_alt_text">Downvote</string>
     <string name="loading_text">Loading…</string>
-    <string name="comment_button_alt_text">Comment Button</string>
+    <string name="comment_button_alt_text">Comment</string>
+    <string name="dm_button_alt_text">Direct Message</string>
 </resources>

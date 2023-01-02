@@ -21,9 +21,7 @@
             app:layout_constraintTop_toTopOf="@id/swipe_refresh_layout"
             tools:listitem="@layout/single_post"/>
 
-
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-
 
 
 

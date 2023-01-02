@@ -15,6 +15,18 @@ import com.example.sidechatproxy.API_Handler.Companion.get_user_and_group
 import com.example.sidechatproxy.LoadingScreen.Companion.setup_loading_screen
 import java.util.concurrent.atomic.AtomicBoolean
 
+/*
+TODOs:
+Implement comment button
+Implement upvotes/downvotes
+FAQ Page
+----- V0.1 Complete -----
+Implement creating a text post [later, image posts as well]
+Implement commenting
+Implement poll viewing
+Pre-load images when loading posts (in load_everything_runnable) -- Will prevent image pop-in
+Make setup process more responsive[?]
+ */
 
 class StartupScreen : AppCompatActivity() {
     companion object {

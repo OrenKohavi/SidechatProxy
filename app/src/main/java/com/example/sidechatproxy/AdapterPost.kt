@@ -6,12 +6,17 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import com.example.sidechatproxy.API_Handler.Companion.get
+import com.example.sidechatproxy.API_Handler.Companion.getImageFromUrl
+import com.example.sidechatproxy.API_Handler.Companion.get_image
+import com.example.sidechatproxy.StartupScreen.Companion.token
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -42,7 +47,7 @@ class AdapterPost(
             //Time stuff is fucky, so just put it all in a try/catch
             val dateFormat = SimpleDateFormat("yyyy-mm-dd'T'hh:mm:ss.SSS'Z'", Locale.US)
             dateFormat.timeZone = TimeZone.getTimeZone("GMT");
-            Log.d("Debug", "Current timezone is: " + TimeZone.getDefault())
+            //Log.d("Debug", "Current timezone is: " + TimeZone.getDefault())
             val postedTime = dateFormat.parse(created_at)!!
             val time = postedTime.time
             val now = System.currentTimeMillis()
@@ -57,7 +62,15 @@ class AdapterPost(
         holder.post_body.text = body
         holder.post_info.text = dateString
         holder.vote_counter.text = num_upvotes.toString()
-        holder.post_image.visibility = GONE
+        if (image_url != null) {
+            holder.post_image.visibility = VISIBLE
+            //Log.d("Debug", "Token: $token")
+            Log.d("Debug", "Trying to use picasso to get image from url: $image_url")
+            Log.d("Debug", "Post Content: $body")
+            getImageFromUrl(image_url, holder.post_image, token!!)
+        } else {
+            holder.post_image.visibility = GONE
+        }
     }
 
     override fun getItemCount(): Int {

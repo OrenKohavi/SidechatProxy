@@ -1,16 +1,16 @@
 package com.example.sidechatproxy
 
 import android.annotation.SuppressLint
+import android.graphics.BitmapFactory
 import android.util.Log
 import com.example.sidechatproxy.StartupScreen.Companion.longterm_put
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.module.kotlin.*
 import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.OkHttpClient
-import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.net.URL
 import android.provider.Settings
+import android.widget.ImageView
 import com.example.sidechatproxy.StartupScreen.Companion.group_id
 import com.example.sidechatproxy.StartupScreen.Companion.longterm_get
 import com.example.sidechatproxy.StartupScreen.Companion.memory_posts
@@ -18,6 +18,8 @@ import com.example.sidechatproxy.StartupScreen.Companion.memory_strings
 import com.example.sidechatproxy.StartupScreen.Companion.startup_activity_context
 import com.example.sidechatproxy.StartupScreen.Companion.token
 import com.example.sidechatproxy.StartupScreen.Companion.user_id
+import okhttp3.*
+import okio.IOException
 import java.security.MessageDigest
 import java.util.concurrent.Callable
 import java.util.concurrent.FutureTask
@@ -243,10 +245,46 @@ class API_Handler {
             }
         }
 
+        fun getImageFromUrl(url: String, imageView: ImageView, token: String) {
+            val request = Request.Builder()
+                .url(url)
+                .header("Authorization", "Bearer $token")
+                .build()
+            val client = OkHttpClient()
+            client.newCall(request).enqueue(object : Callback {
+                override fun onFailure(call: Call, e: IOException) {
+                    // handle failure
+                }
+
+                override fun onResponse(call: Call, response: Response) {
+                    val inputStream = response.body!!.byteStream()
+                    val bitmap = BitmapFactory.decodeStream(inputStream)
+                    imageView.post {
+                        imageView.setImageBitmap(bitmap)
+                    }
+                }
+            })
+        }
+
+        fun get_image(url: String, bearer_token: String): Any {
+            val c = FutureTask { _get(url, bearer_token) }
+            Thread(c).start()
+            val result = c.get()
+            Log.d("Debug", "Image result is: $result")
+            return result
+        }
+
         private fun get_returnfuture(url: String, bearer_token: String?): FutureTask<Map<String, Any>> {
             Log.d("Debug_API", "Submitting GET request to $url")
             val get_callable = Callable {
-                return@Callable _get(url, bearer_token)
+                val responseBody: String = _get(url, bearer_token) as String
+
+                val mapper = jacksonObjectMapper()
+                @Suppress("UNCHECKED_CAST") //Safe to assume string keys, because JSON can only have string keys
+                val objData = mapper.readValue(responseBody, Map::class.java) as Map<String, Any>
+
+                Log.d("Debug_API", "Parsed Response is: $objData")
+                return@Callable objData
             }
             val future_callable = FutureTask(get_callable)
             val thread = Thread(future_callable)
@@ -262,7 +300,7 @@ class API_Handler {
             return result
         }
 
-        private fun _get(plaintext_url: String, bearer_token: String?): Map<String, Any> {
+        private fun _get(plaintext_url: String, bearer_token: String?): Any {
             val client = OkHttpClient()
             val url = URL(plaintext_url)
 
@@ -280,19 +318,8 @@ class API_Handler {
             }
 
             val response = client.newCall(request).execute()
-
             val responseBody = response.body!!.string()
-
-            //Response
-            Log.d("Debug_API", "Response Body: $responseBody")
-
-            val mapper = jacksonObjectMapper()
-            @Suppress("UNCHECKED_CAST") //Safe to assume string keys, because JSON can only have string keys
-            val objData: Map<String, Any> = mapper.readValue(responseBody, Map::class.java) as Map<String, Any>
-
-            Log.d("Debug_API", "Parsed Response is: $objData")
-
-            return objData
+            return responseBody
         }
 
         //Version of the post method with no token

@@ -85,6 +85,7 @@
         android:id="@+id/comment_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
         android:contentDescription="@string/comment_button_alt_text"
         android:src="@drawable/comments_icon"
         app:layout_constraintBottom_toBottomOf="parent"

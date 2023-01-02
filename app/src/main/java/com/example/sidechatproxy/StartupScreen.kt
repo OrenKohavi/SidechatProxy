@@ -56,6 +56,7 @@ class StartupScreen : AppCompatActivity() {
                 Log.d("Debug", "Getting posts in runnable")
                 get_all_posts()
             }
+            //TODO Go through the posts, and get all the images from all the posts before finishing loading!
             loading_complete.set(true)
         }
 

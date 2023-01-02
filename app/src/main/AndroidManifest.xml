@@ -32,6 +32,8 @@
         <activity android:name=".SetupEmail" android:parentActivityName=".SetupAge"/>
         <activity android:name=".SetupWaitForEmailVerification" android:parentActivityName=".SetupEmail"/>
 
+        <activity android:name=".LoadingScreen"/>
+
         <activity android:name=".PostsMain"/>
         <activity android:name=".FAQ"/>
     </application>

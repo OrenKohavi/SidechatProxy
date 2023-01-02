@@ -39,24 +39,15 @@ class PostsMain : AppCompatActivity() {
         setContentView(R.layout.layout_posts_main)
         //Make sure that the user, group, and posts are all loaded
         if (user_id == null || group_id == null || token == null) {
-            //Load the user (and group_id, because they come as part of the same API response)
-            try {
-                get_user_and_group()
-            } catch (e : APIException) {
-                latest_errmsg = e.message.toString()
-                val switchActivityIntent = Intent(this, ErrorDisplay::class.java)
-                startActivity(switchActivityIntent)
-            }
+            Log.d("Debug", "Null core values in PostsMain! $user_id | $group_id | $token")
+            latest_errmsg = "Null core values in PostsMain! $user_id | $group_id | $token"
+            startActivity(Intent(this, ErrorDisplay::class.java))
         }
         //User and Group are loaded, so we can fetch posts!
         if (memory_posts["hot"] == null || memory_posts["recent"] == null || memory_posts["top"] == null) {
-            try {
-                get_all_posts()
-            } catch (e: APIException) {
-                latest_errmsg = e.message.toString()
-                val switchActivityIntent = Intent(this, ErrorDisplay::class.java)
-                startActivity(switchActivityIntent)
-            }
+            Log.d("Debug", "Null post values in PostsMain! " + memory_posts["hot"] + " | " + memory_posts["recent"] + " | " + memory_posts["top"])
+            latest_errmsg = "Null post values in PostsMain! " + memory_posts["hot"] + " | " + memory_posts["recent"] + " | " + memory_posts["top"]
+            startActivity(Intent(this, ErrorDisplay::class.java))
         }
         //Setup tabs
         val tabLayout = findViewById<TabLayout>(R.id.tabs)

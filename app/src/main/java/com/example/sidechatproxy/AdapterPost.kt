@@ -1,6 +1,8 @@
 package com.example.sidechatproxy
 
 import android.content.Context
+import android.text.format.DateUtils
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
@@ -12,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import java.text.SimpleDateFormat
 import java.util.*
+
 
 class AdapterPost(
     private val context:Context,
@@ -34,13 +37,25 @@ class AdapterPost(
 
         //2023-01-01T20:00:07.448Z
 
-        //val dateFormat = SimpleDateFormat("yyyy-mm-dd'T'hh:mm:ss:SSSZ", Locale.US)
-        //val dateFormat2 = SimpleDateFormat("MMM DD", Locale.US)
-        //val postedTime = dateFormat.parse(created_at)!!
-        //val formattedDate = dateFormat2.format(postedTime)
+        var dateString: String
+        try {
+            //Time stuff is fucky, so just put it all in a try/catch
+            val dateFormat = SimpleDateFormat("yyyy-mm-dd'T'hh:mm:ss.SSS'Z'", Locale.US)
+            dateFormat.timeZone = TimeZone.getTimeZone("GMT");
+            Log.d("Debug", "Current timezone is: " + TimeZone.getDefault())
+            val postedTime = dateFormat.parse(created_at)!!
+            val time = postedTime.time
+            val now = System.currentTimeMillis()
+            val ago = DateUtils.getRelativeTimeSpanString(time, now, DateUtils.MINUTE_IN_MILLIS)
+            dateString = ago as String
+        } catch (e : Exception) {
+            Log.d("Debug", "Time parsing exception! ${e.printStackTrace()}")
+            dateString = "Unknown Time Ago"
+        }
+
 
         holder.post_body.text = body
-        holder.post_info.text = created_at
+        holder.post_info.text = dateString
         holder.vote_counter.text = num_upvotes.toString()
         holder.post_image.visibility = GONE
     }

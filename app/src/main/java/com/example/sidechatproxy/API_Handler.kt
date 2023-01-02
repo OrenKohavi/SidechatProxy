@@ -35,7 +35,6 @@ class API_Handler {
             group_id = group["id"] as String
             memory_strings["group_color"] = group["color"] as String
             memory_strings["group_name"] = group["name"] as String
-            memory_strings["group_id"] = group["id"] as String
             memory_strings["group_icon_url"] = group["icon_url"] as String
             longterm_put("group_id", group_id!!)
             Log.d("Debug", "Longterm Stored group_id: $group_id")
@@ -43,10 +42,6 @@ class API_Handler {
 
         fun get_user_and_group() {
             Log.d("Debug_API", "updating user and group")
-            val group_id = longterm_get("group_id") ?: throw APIException("Stored group_id was null!")
-            val _token: String = longterm_get("token") ?: throw APIException("Stored token was null!")
-            token = _token //For future API calls, so that they don't need to use longterm memory
-            Log.d("Debug_API", "Set token in memory to: $token")
             val response_future = get_returnfuture(
                 "https://api.sidechat.lol/v1/updates?group_id=$group_id",
                 token
@@ -75,12 +70,10 @@ class API_Handler {
             val hot_future = get_returnfuture("https://api.sidechat.lol/v1/posts?group_id=$group_id&type=hot", token)
             val new_future = get_returnfuture("https://api.sidechat.lol/v1/posts?group_id=$group_id&type=recent", token)
             val top_future = get_returnfuture("https://api.sidechat.lol/v1/posts?group_id=$group_id&type=top", token)
-            //Hopefully all three GET requests are running simultaneously
+            //Hopefully all three GET requests are running simultaneously here (better than sequentially, but still not ideal)
             memory_posts["hot"] = get_posts(hot_future)
             memory_posts["recent"] = get_posts(new_future)
             memory_posts["top"] = get_posts(top_future)
-            Log.d("Debug", "Stored hot, recent, and top posts into memory")
-            //This is still basically networking on the main thread (boo), but at least hopefully it's not three sequential calls
             Log.d("Debug", "Finished getting all posts")
         }
 

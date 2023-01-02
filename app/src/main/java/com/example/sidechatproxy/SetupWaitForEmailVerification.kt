@@ -19,8 +19,11 @@ class SetupWaitForEmailVerification : AppCompatActivity() {
                 //Check if email is verified
                 val email_verified = check_email_verification()
                 if (email_verified) {
-                    val switchActivityIntent = Intent(app_context, PostsMain::class.java)
-                    startActivity(switchActivityIntent)
+                    LoadingScreen.setup_loading_screen(
+                        PostsMain::class.java,
+                        StartupScreen.load_everything_runnable
+                    )
+                    startActivity(Intent(app_context, LoadingScreen::class.java))
                 } else {
                     //try again in one second
                     mainHandler.postDelayed(this, 1000)

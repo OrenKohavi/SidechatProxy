@@ -10,21 +10,55 @@ import android.util.Log
 import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.example.sidechatproxy.API_Handler.Companion.get_all_posts
+import com.example.sidechatproxy.API_Handler.Companion.get_user_and_group
+import com.example.sidechatproxy.LoadingScreen.Companion.setup_loading_screen
+import java.util.concurrent.atomic.AtomicBoolean
 
 
 class StartupScreen : AppCompatActivity() {
     companion object {
         //Probably bad practice, but I'm just using this companion object to store 'globals'
         var latest_errmsg: String = "Unknown Error!"
-        var loading_complete: Boolean = true
-        @Suppress("StaticFieldLeak")
-        var next_screen: Class<*>? = null
+        var loading_complete: AtomicBoolean = AtomicBoolean(true)
+        var loading_error: AtomicBoolean = AtomicBoolean(false)
         //var info_in_memory: MutableMap<String, Any> = mutableMapOf()
         var user_id: String? = null
         var group_id: String? = null
         var token: String? = null
         var memory_strings: MutableMap<String, String> = mutableMapOf()
         var memory_posts: MutableMap<String, List<Post>> = mutableMapOf()
+
+        val load_everything_runnable = Runnable {
+            if (token == null) {
+                token = longterm_get("group_id")
+                if (token == null) {
+                    //If it's still null, error
+                    latest_errmsg = "longterm stored token was null!"
+                    loading_error.set(true)
+                    return@Runnable
+                }
+            }
+            if (group_id == null) {
+                group_id = longterm_get("group_id")
+                if (group_id == null) {
+                    //If it's still null, error
+                    latest_errmsg = "longterm stored group_id was null"
+                    loading_error.set(true)
+                    return@Runnable
+                }
+            }
+            if (user_id == null) {
+                Log.d("Debug", "Getting user/group in runnable")
+                get_user_and_group()
+            }
+            if (memory_posts["hot"] == null || memory_posts["recent"] == null || memory_posts["top"] == null) {
+                Log.d("Debug", "Getting posts in runnable")
+                get_all_posts()
+            }
+            loading_complete.set(true)
+        }
+
         @Suppress("StaticFieldLeak")
         lateinit var startup_activity_context: Activity
         // ^ Yes, this is a memory leak because the StartupScreen will never get deallocated
@@ -65,8 +99,8 @@ class StartupScreen : AppCompatActivity() {
             if (token != null){
                 Log.d("Debug", "Login already complete, going to PostMain")
                 //Go straight to the posts
-                val switchActivityIntent = Intent(this, PostsMain::class.java)
-                startActivity(switchActivityIntent)
+                setup_loading_screen(PostsMain::class.java, load_everything_runnable) //Setup loading screen
+                startActivity(Intent(this, LoadingScreen::class.java)) //Go to loading screen
             } else {
                 Log.d("Debug", "Login not complete, going to SetupPhone")
                 //Go to the login process

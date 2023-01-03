@@ -32,6 +32,7 @@
         android:inputType="phone"
         android:minHeight="48sp"
         android:layout_marginHorizontal="30dp"
+        android:imeOptions="actionDone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"

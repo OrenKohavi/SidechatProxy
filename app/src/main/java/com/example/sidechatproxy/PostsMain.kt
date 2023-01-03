@@ -41,11 +41,7 @@ class PostsMain : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.layout_posts_main)
-        //Hide bar
-        supportActionBar?.hide()
         val window: Window = this.window
-        // clear FLAG_TRANSLUCENT_STATUS flag:
-        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         // add FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS flag to the window
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         if (memory_strings["group_color"]?.length != 7) {
@@ -55,7 +51,7 @@ class PostsMain : AppCompatActivity() {
                 "Debug",
                 "Bad color format! --> ${memory_strings["group_color"]} <-- setting to #CCCCCC"
             )
-            memory_strings["group_color"] = "#CCCCCC"
+            memory_strings["group_color"] = "#CCCCCC" // @color/light_grey
         }
         Log.d("Debug", "Setting statusBar to: ${memory_strings["group_color"]}")
         window.statusBarColor = parseColor(memory_strings["group_color"])

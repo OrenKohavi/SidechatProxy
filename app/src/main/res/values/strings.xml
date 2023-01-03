@@ -16,7 +16,7 @@
     <string name="email_field_filler">josiah_carberry@brown.edu</string>
     <string name="email_text">Finally, enter your .edu email address</string>
     <string name="email_continue_button">Continue</string>
-    <string name="email_waiting_text">A confirmation link has been sent to your email\nClick the link and then we\'re all set!</string>
+    <string name="email_waiting_text">A confirmation link has been sent to your email.\nClick the link and then we\'re all set!</string>
     <string name="get_started_button_text">Get Started</string>
     <string name="about_button_label">About This App</string>
     <string name="verson_number">V0.1</string>

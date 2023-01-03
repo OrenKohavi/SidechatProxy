@@ -13,11 +13,12 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.SidechatProxy"
+        android:theme="@style/Theme.PinkTheme"
         tools:targetApi="33">
 
         <activity
             android:name=".StartupScreen"
+            android:theme="@style/Theme.PinkThemeActionBar"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -32,9 +33,9 @@
         <activity android:name=".SetupEmail" android:parentActivityName=".SetupAge"/>
         <activity android:name=".SetupWaitForEmailVerification" android:parentActivityName=".SetupEmail"/>
 
-        <activity android:name=".LoadingScreen"/>
+        <activity android:name=".LoadingScreen" android:noHistory="true"/>
 
-        <activity android:name=".PostsMain"/>
+        <activity android:name=".PostsMain" android:theme="@style/Theme.NeutralTheme"/>
         <activity android:name=".FAQ"/>
     </application>
 

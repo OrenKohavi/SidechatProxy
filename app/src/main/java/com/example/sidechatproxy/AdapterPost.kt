@@ -85,7 +85,6 @@ class AdapterPost(
 
     fun updatePostList(new_list: List<Post>) {
         postList = new_list
-        this.notifyDataSetChanged()
     }
 
     private fun bind_buttons(holder: HolderPost, ctx: Context){

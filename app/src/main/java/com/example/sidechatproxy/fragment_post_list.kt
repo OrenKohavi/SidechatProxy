@@ -1,5 +1,6 @@
 package com.example.sidechatproxy
 
+import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
@@ -83,12 +84,14 @@ class fragment_post_list : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         )
         val mainHandler = Handler(Looper.getMainLooper())
         mainHandler.postDelayed(object : Runnable {
+            @SuppressLint("NotifyDataSetChanged")
             override fun run() {
                 val new_post_list = get_posts(post_getter_future)
                 Log.d("Debug", "Done Refreshing")
                 memory_posts[adapterPost.category] = new_post_list
                 adapterPost.updatePostList(memory_posts[adapterPost.category]!!)
                 swr.isRefreshing = false
+                adapterPost.notifyDataSetChanged()
             }
         }, 200)
     }

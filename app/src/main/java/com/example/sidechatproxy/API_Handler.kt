@@ -136,19 +136,26 @@ class API_Handler {
             }
         }
 
-        fun register_email(email: String) {
-            val get_response = get("https://api.sidechat.lol/v1/login_type?email=$email", token)
-            if (get_response.isNotEmpty()) {
-                throw APIException("email get falied: $get_response")
+        fun register_email(email: String): String {
+            val get_response = get("https://api.sidechat.lol/v1/groups/login_type?email=$email", token)
+            Log.d("Debug", "Get Response: $get_response")
+            if ((get_response["message"] as String?)?.isNotEmpty() == true) {
+                return get_response["message"] as String
+            } else if (get_response.isNotEmpty()) {
+                throw APIException("email get failed: $get_response")
             }
             val post_response = post(
                 "https://api.sidechat.lol/v2/users/register_email",
                 mapOf("email" to email),
                 token
             )
-            if (post_response.isNotEmpty()) {
+            Log.d("Debug", "Post Response: $post_response")
+            if ((post_response["message"] as String?)?.isNotEmpty() == true) {
+                return post_response["message"] as String
+            } else if (post_response.isNotEmpty()) {
                 throw APIException("email post falied: $post_response")
             }
+            return "" //Return empty string to mark a no-error response
         }
 
         fun complete_registration(age: String) {
@@ -279,6 +286,11 @@ class API_Handler {
             Log.d("Debug_API", "Submitting GET request to $url")
             val get_callable = Callable {
                 val responseBody: String = _get(url, bearer_token) as String
+                //Log.d("Debug", "Inside get_returnfuture, responseBody is: $responseBody")
+
+                if (responseBody.isEmpty()) {
+                    return@Callable mapOf()
+                }
 
                 val mapper = jacksonObjectMapper()
                 @Suppress("UNCHECKED_CAST") //Safe to assume string keys, because JSON can only have string keys

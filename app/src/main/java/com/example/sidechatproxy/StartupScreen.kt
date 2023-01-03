@@ -11,6 +11,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.example.sidechatproxy.API_Handler.Companion.get_all_posts
 import com.example.sidechatproxy.API_Handler.Companion.get_user_and_group
+import com.example.sidechatproxy.LoadingScreen.Companion.next_screen
 import com.example.sidechatproxy.LoadingScreen.Companion.setup_loading_screen
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -44,18 +45,21 @@ class StartupScreen : AppCompatActivity() {
             if (token == null) {
                 token = longterm_get("group_id")
                 if (token == null) {
-                    //If it's still null, error
-                    latest_errmsg = "longterm stored token was null!"
-                    loading_error.set(true)
+                    //If it's still null, setup needs to be re-done
+                    show_dialog(startup_activity_context, "Incomplete Setup", "Re-Doing Setup Process")
+                    next_screen = SetupPhone::class.java
+                    loading_complete.set(true)
                     return@Runnable
                 }
             }
             if (group_id == null) {
                 group_id = longterm_get("group_id")
                 if (group_id == null) {
-                    //If it's still null, error
-                    latest_errmsg = "longterm stored group_id was null"
-                    loading_error.set(true)
+                    //If it's still null, setup needs to be redone
+                    //We can resume from the 'email' screen, since a token already exists
+                    //show_dialog(startup_activity_context, "Incomplete Setup", "Re-Doing Setup Process")
+                    next_screen = SetupEmail::class.java
+                    loading_complete.set(true)
                     return@Runnable
                 }
             }

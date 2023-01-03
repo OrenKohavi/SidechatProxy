@@ -16,6 +16,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 class LoadingScreen : AppCompatActivity() {
     companion object {
         var next_screen: Class<*>? = null
+        var prev_screen: Class<*>? = null
 
         fun setup_loading_screen(next_screen_arg: Class<*>, loading_runnable: Runnable) {
             //Start the runnable in a new thread

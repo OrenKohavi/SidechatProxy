@@ -5,10 +5,20 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import android.widget.EditText
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import com.example.sidechatproxy.StartupScreen.Companion.latest_errmsg
 import com.example.sidechatproxy.StartupScreen.Companion.load_everything_runnable
+import com.example.sidechatproxy.StartupScreen.Companion.show_dialog
 
 class SetupTwoFactor : AppCompatActivity() {
+    companion object {
+        enum class TwoFactorResponse {
+            Auth_Complete,
+            Auth_Required,
+            Auth_Failed
+        }
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.layout_setup_twofactor)
@@ -18,7 +28,12 @@ class SetupTwoFactor : AppCompatActivity() {
             Log.d("Debug", "Twofactor Continue Clicked")
             val twofactor_code: String = twofactorNumberField.text.toString()
             try {
-                val needs_additional_setup = API_Handler.phone_verify(twofactor_code)
+                val response: TwoFactorResponse = API_Handler.phone_verify(twofactor_code)
+                if (response == TwoFactorResponse.Auth_Failed) {
+                    show_dialog(this, "Verification Failed", latest_errmsg)
+                    return@setOnClickListener
+                }
+                val needs_additional_setup = (response == TwoFactorResponse.Auth_Required)
                 if (needs_additional_setup) {
                     val switchActivityIntent = Intent(this, SetupAge::class.java)
                     startActivity(switchActivityIntent)

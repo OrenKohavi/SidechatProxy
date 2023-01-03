@@ -1,14 +1,13 @@
 package com.example.sidechatproxy
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.text.method.TextKeyListener.clear
 import android.util.Log
 import android.widget.Button
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.example.sidechatproxy.API_Handler.Companion.get_all_posts
 import com.example.sidechatproxy.API_Handler.Companion.get_user_and_group
@@ -38,7 +37,7 @@ class StartupScreen : AppCompatActivity() {
         var user_id: String? = null
         var group_id: String? = null
         var token: String? = null
-        var memory_strings: MutableMap<String, String> = mutableMapOf()
+        var memory_strings: MutableMap<String, String?> = mutableMapOf()
         var memory_posts: MutableMap<String, List<Post>> = mutableMapOf()
 
         val load_everything_runnable = Runnable {
@@ -90,6 +89,16 @@ class StartupScreen : AppCompatActivity() {
             val sharedPref = startup_activity_context.getPreferences(Context.MODE_PRIVATE)
             return sharedPref.getString(k, null)
         }
+
+        fun show_dialog(ctx: Context, title: String, message: String) {
+            // setup the alert builder
+            val builder: AlertDialog.Builder = AlertDialog.Builder(ctx)
+            builder.setTitle(title)
+            builder.setMessage(message)
+            builder.setPositiveButton("OK", null)
+            val dialog: AlertDialog = builder.create()
+            dialog.show()
+        }
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -104,6 +113,7 @@ class StartupScreen : AppCompatActivity() {
 
         //Attempt to retrieve token from memory to see if login exists
         token = longterm_get("token")
+        memory_strings["group_color"] = longterm_get("group_color")
 
         val getStartedButton: Button = findViewById(R.id.get_started_button)
         val aboutButton: Button = findViewById(R.id.about_button)
@@ -123,7 +133,7 @@ class StartupScreen : AppCompatActivity() {
         }
 
         aboutButton.setOnClickListener {
-            Toast.makeText(applicationContext, "Coming Soon!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(applicationContext, "FAQ Coming Soon!", Toast.LENGTH_SHORT).show()
         }
     }
 }

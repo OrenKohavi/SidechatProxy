@@ -6,17 +6,19 @@
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="5sp"
     android:layout_marginVertical="5sp"
-    android:background="@color/white">
+    android:background="@drawable/rounded_rectangle"
+    android:clipToOutline="true">
 
     <TextView
         android:id="@+id/post_body"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_margin="5sp"
+        android:layout_marginStart="8dp"
         android:text="Post Body Placeholder"
         android:textColor="@color/black"
         android:textSize="24sp"
-        app:layout_constraintBottom_toTopOf="@+id/post_image"
+        app:layout_constraintBottom_toTopOf="@+id/image_cardview"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -36,7 +38,7 @@
         android:id="@+id/upvote_button"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="4dp"
         android:contentDescription="@string/upvote_button_alt_text"
         android:minWidth="48dp"
         android:paddingHorizontal="8sp"
@@ -51,7 +53,7 @@
         android:id="@+id/downvote_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="4dp"
+        android:layout_marginStart="0dp"
         android:contentDescription="@string/downvote_button_alt_text"
         android:minWidth="48dp"
         android:paddingHorizontal="4sp"
@@ -61,27 +63,39 @@
         app:layout_constraintStart_toEndOf="@+id/vote_counter"
         app:layout_constraintTop_toTopOf="@+id/post_button_guideline" />
 
-    <ImageView
-        android:id="@+id/post_image"
+    <androidx.cardview.widget.CardView
+        android:id="@+id/image_cardview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:scaleType="centerInside"
+        android:elevation="4dp"
         android:layout_marginStart="12dp"
         android:layout_marginEnd="12dp"
+        app:layout_constrainedWidth="true"
+        app:layout_constrainedHeight="true"
+        app:cardCornerRadius="10dp"
         app:layout_constraintBottom_toTopOf="@+id/post_button_guideline"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/post_body"
-        app:layout_constraintVertical_bias="1.0"
-        tools:srcCompat="@tools:sample/avatars"
-        android:contentDescription="TODO" />
+        app:layout_constraintVertical_bias="1.0">
+
+        <ImageView
+            android:id="@+id/post_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:scaleType="centerInside"
+
+            tools:srcCompat="@tools:sample/avatars" />
+
+    </androidx.cardview.widget.CardView>
+
 
     <TextView
         android:id="@+id/vote_counter"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="4dp"
         android:gravity="center"
+        android:minWidth="32dp"
         android:text="69"
         android:textColor="@color/black"
         android:textSize="22sp"
@@ -93,12 +107,14 @@
         android:id="@+id/comment_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="4dp"
         android:contentDescription="@string/comment_button_alt_text"
         android:minHeight="48dp"
         android:src="@drawable/comments_icon"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/post_button_guideline" />
+        app:layout_constraintEnd_toStartOf="@+id/comment_counter"
+        app:layout_constraintTop_toTopOf="@+id/post_button_guideline"
+        app:layout_constraintVertical_bias="0.0" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/post_button_guideline"
@@ -107,6 +123,7 @@
         android:orientation="horizontal"
         app:layout_constraintGuide_end="48dp" />
 
+    <!--
     <ImageButton
         android:id="@+id/dm_button"
         android:layout_width="wrap_content"
@@ -117,6 +134,21 @@
         app:layout_constraintEnd_toStartOf="@+id/comment_button"
         app:layout_constraintTop_toTopOf="@+id/post_button_guideline"
         app:srcCompat="@drawable/dm_icon" />
+    -->
+
+    <TextView
+        android:id="@+id/comment_counter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:gravity="center"
+        android:text="4"
+        android:textColor="@color/black"
+        android:textSize="22sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/post_button_guideline"
+        app:layout_constraintVertical_bias="0.45" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

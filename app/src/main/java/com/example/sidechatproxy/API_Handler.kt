@@ -12,6 +12,7 @@ import java.net.URL
 import android.provider.Settings
 import android.widget.ImageView
 import com.example.sidechatproxy.StartupScreen.Companion.group_id
+import com.example.sidechatproxy.StartupScreen.Companion.latest_errmsg
 import com.example.sidechatproxy.StartupScreen.Companion.longterm_get
 import com.example.sidechatproxy.StartupScreen.Companion.memory_posts
 import com.example.sidechatproxy.StartupScreen.Companion.memory_strings
@@ -39,6 +40,7 @@ class API_Handler {
             memory_strings["group_name"] = group["name"] as String
             memory_strings["group_icon_url"] = group["icon_url"] as String
             longterm_put("group_id", group_id!!)
+            longterm_put("group_color", group["color"] as String)
             Log.d("Debug", "Longterm Stored group_id: $group_id")
         }
 
@@ -186,7 +188,7 @@ class API_Handler {
             }
         }
 
-        fun phone_verify(twofactor_code: String): Boolean {
+        fun phone_verify(twofactor_code: String): SetupTwoFactor.Companion.TwoFactorResponse {
             val twofactor_code_upper = twofactor_code.uppercase()
             val url = "https://api.sidechat.lol/v1/verify_phone_number"
             val data = mapOf("code" to twofactor_code_upper, "phone_number" to memory_strings["phone_number"].toString())
@@ -194,6 +196,12 @@ class API_Handler {
             Log.d("Debug_API", "Phone Number Verification Response $response")
             //If this is a new user, the response will include a registration_id and setup must continue
             //Otherwise, it includes a user object and a token
+            val message = response.getOrDefault("message", false)
+            if (message != false) {
+                //This likely means authentication failed!
+                latest_errmsg = message as String
+                return SetupTwoFactor.Companion.TwoFactorResponse.Auth_Failed
+            }
             val logged_in_user = response.getOrDefault("logged_in_user", false)
             if (logged_in_user == false) {
                 val registration_id = response.getOrDefault("registration_id", false)
@@ -202,7 +210,7 @@ class API_Handler {
                 } else {
                     memory_strings["registration_id"] = registration_id as String
                 }
-                return true //Additional setup required, go to SetupAge
+                return SetupTwoFactor.Companion.TwoFactorResponse.Auth_Required //Additional setup required, go to SetupAge
             } else {
                 if (logged_in_user !is Map<*, *>) {
                     Log.d("Debug_API", "Logged_in_user exists but is not a map!")
@@ -225,7 +233,7 @@ class API_Handler {
                 parse_user(user)
                 parse_group(group)
                 longterm_put("token", token!!)
-                return false //No additional setup required
+                return SetupTwoFactor.Companion.TwoFactorResponse.Auth_Complete //No additional setup required
             }
         }
 
@@ -267,7 +275,7 @@ class API_Handler {
             })
         }
 
-        private fun get_returnfuture(url: String, bearer_token: String?): FutureTask<Map<String, Any>> {
+        fun get_returnfuture(url: String, bearer_token: String?): FutureTask<Map<String, Any>> {
             Log.d("Debug_API", "Submitting GET request to $url")
             val get_callable = Callable {
                 val responseBody: String = _get(url, bearer_token) as String

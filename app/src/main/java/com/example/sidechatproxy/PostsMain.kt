@@ -1,19 +1,23 @@
 package com.example.sidechatproxy
 
 import android.content.Intent
+import android.graphics.Color.parseColor
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.view.Window
+import android.view.WindowManager
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
-import com.example.sidechatproxy.API_Handler.Companion.get_all_posts
-import com.example.sidechatproxy.API_Handler.Companion.get_user_and_group
 import com.example.sidechatproxy.MyFragmentStateAdapter.Companion.page_to_category
 import com.example.sidechatproxy.StartupScreen.Companion.group_id
 import com.example.sidechatproxy.StartupScreen.Companion.latest_errmsg
 import com.example.sidechatproxy.StartupScreen.Companion.memory_posts
+import com.example.sidechatproxy.StartupScreen.Companion.memory_strings
 import com.example.sidechatproxy.StartupScreen.Companion.token
 import com.example.sidechatproxy.StartupScreen.Companion.user_id
 import com.google.android.material.tabs.TabLayout
@@ -37,6 +41,24 @@ class PostsMain : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.layout_posts_main)
+        //Hide bar
+        supportActionBar?.hide()
+        val window: Window = this.window
+        // clear FLAG_TRANSLUCENT_STATUS flag:
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        // add FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS flag to the window
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        if (memory_strings["group_color"]?.length != 7) {
+            //Basic sanity check for the right format: #XXXXXX
+            //If not, just set it to grey or something
+            Log.d(
+                "Debug",
+                "Bad color format! --> ${memory_strings["group_color"]} <-- setting to #CCCCCC"
+            )
+            memory_strings["group_color"] = "#CCCCCC"
+        }
+        Log.d("Debug", "Setting statusBar to: ${memory_strings["group_color"]}")
+        window.statusBarColor = parseColor(memory_strings["group_color"])
         //Make sure that the user, group, and posts are all loaded
         if (user_id == null || group_id == null || token == null) {
             Log.d("Debug", "Null core values in PostsMain! $user_id | $group_id | $token")

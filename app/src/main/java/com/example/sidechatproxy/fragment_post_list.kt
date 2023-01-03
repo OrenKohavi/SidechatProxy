@@ -1,6 +1,9 @@
 package com.example.sidechatproxy
 
+import android.graphics.Color
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -11,7 +14,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.sidechatproxy.API_Handler.Companion.get_all_posts
+import com.example.sidechatproxy.API_Handler.Companion.get_posts
+import com.example.sidechatproxy.StartupScreen.Companion.group_id
 import com.example.sidechatproxy.StartupScreen.Companion.memory_posts
+import com.example.sidechatproxy.StartupScreen.Companion.token
 
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 private const val CATEGORY = "hot_posts"
@@ -56,9 +62,10 @@ class fragment_post_list : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_post_list, container, false)
         val recyclerView = view.findViewById<RecyclerView>(R.id.post_list_recyclerview)
-        adapterPost = AdapterPost(requireContext(), memory_posts[category]!!)
+        adapterPost = AdapterPost(requireContext(), memory_posts[category]!!, category!!)
         recyclerView.adapter = adapterPost
         recyclerView.layoutManager = LinearLayoutManager(view.context)
+        recyclerView.setBackgroundColor(Color.parseColor(StartupScreen.memory_strings["group_color"]))
 
         swr = view.findViewById<SwipeRefreshLayout>(R.id.swipe_refresh_layout)
         swr.setOnRefreshListener(this)
@@ -70,9 +77,19 @@ class fragment_post_list : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     override fun onRefresh() {
         Log.d("Debug", "Refreshing Posts w/ swipeup")
-        get_all_posts()
-        Log.d("Debug", "Done Refreshing")
-        adapterPost.notifyDataSetChanged();
-        swr.isRefreshing = false
+        val post_getter_future = API_Handler.get_returnfuture(
+            "https://api.sidechat.lol/v1/posts?group_id=$group_id&type=${adapterPost.category}",
+            token
+        )
+        val mainHandler = Handler(Looper.getMainLooper())
+        mainHandler.postDelayed(object : Runnable {
+            override fun run() {
+                val new_post_list = get_posts(post_getter_future)
+                Log.d("Debug", "Done Refreshing")
+                memory_posts[adapterPost.category] = new_post_list
+                adapterPost.updatePostList(memory_posts[adapterPost.category]!!)
+                swr.isRefreshing = false
+            }
+        }, 200)
     }
 }

@@ -14,6 +14,7 @@
         android:gravity="center"
         android:text="@string/loading_text"
         android:textSize="42sp"
+        android:textColor="?android:attr/textColorPrimary"
         app:layout_constraintTop_toTopOf="parent"
         tools:layout_editor_absoluteX="0dp" />
 
@@ -23,6 +24,7 @@
         android:layout_height="100dp"
         android:layout_marginTop="8dp"
         android:src="@drawable/loading_icon"
+        app:tint="?android:attr/textColorPrimary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"

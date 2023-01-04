@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.sidechatproxy.StartupScreen.Companion.latest_errmsg
 import com.example.sidechatproxy.StartupScreen.Companion.load_everything_runnable
 import com.example.sidechatproxy.StartupScreen.Companion.show_dialog
+import com.example.sidechatproxy.StartupScreen.Companion.token
 
 
 class SetupTwoFactor : AppCompatActivity() {
@@ -18,7 +19,8 @@ class SetupTwoFactor : AppCompatActivity() {
         enum class TwoFactorResponse {
             Auth_Complete,
             Auth_Required,
-            Auth_Failed
+            Auth_Failed,
+            Auth_Email_Required
         }
     }
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,6 +53,11 @@ class SetupTwoFactor : AppCompatActivity() {
             val response: TwoFactorResponse = API_Handler.phone_verify(twofactor_code)
             if (response == TwoFactorResponse.Auth_Failed) {
                 show_dialog(this, "Verification Failed", latest_errmsg)
+                return
+            }
+            if (response == TwoFactorResponse.Auth_Email_Required) {
+                Log.d("Debug", "Going to SetupEmail")
+                startActivity(Intent(this, SetupEmail::class.java))
                 return
             }
             val needs_additional_setup = (response == TwoFactorResponse.Auth_Required)

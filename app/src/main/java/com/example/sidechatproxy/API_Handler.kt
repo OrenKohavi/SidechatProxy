@@ -137,6 +137,7 @@ class API_Handler {
         }
 
         fun register_email(email: String): String {
+            Log.d("Debug", "Deleteme: token is: $token")
             val get_response = get("https://api.sidechat.lol/v1/groups/login_type?email=$email", token)
             Log.d("Debug", "Get Response: $get_response")
             if ((get_response["message"] as String?)?.isNotEmpty() == true) {
@@ -167,11 +168,13 @@ class API_Handler {
             )
             val response = post(url, data)
             Log.d("Debug_API", "Registration Completion Response $response")
-            val _token = response.getOrDefault("token", false)
+            val _token = response.getOrDefault("token", "") as String
             val user = response.getOrDefault("user", false)
             Log.d("Debug_API", "Token is: $token")
             Log.d("Debug_API", "User is: $user")
-            if (_token == false) {
+            if (_token.isEmpty() || _token.length < 64) {
+                //bad token
+                Log.d("Debug", "Bad Token!")
                 throw APIException(response.toString())
             } else {
                 token = _token as String
@@ -229,13 +232,22 @@ class API_Handler {
                 try {
                     @Suppress("UNCHECKED_CAST")
                     user = logged_in_user["user"] as Map<String, Any>
-                    @Suppress("UNCHECKED_CAST")
-                    group = logged_in_user["group"] as Map<String, Any>
-                } catch (e: java.lang.Exception) {
+                } catch (e: Exception) {
                     Log.d("Debug", "logged_in_user - Error converting to Map: $logged_in_user")
                     throw APIException("logged_in_user - Error converting to map: $logged_in_user")
                 }
+                try {
+                    @Suppress("UNCHECKED_CAST")
+                    group = logged_in_user["group"] as Map<String, Any>
+                } catch (e: Exception) {
+                    Log.d("Debug", "No group found! Redoing email setup")
+                    return SetupTwoFactor.Companion.TwoFactorResponse.Auth_Email_Required
+                }
                 token = logged_in_user["token"] as String
+                if (token!!.isEmpty() || token!!.length < 64) {
+                    //Bad token
+                    throw APIException("Bad token recieved in phone_verify: $token [is null?: ${token == null}]")
+                }
                 Log.d("Debug_API", "Values retrieved! Token is: $token, group is $group, user is $user")
                 parse_user(user)
                 parse_group(group)
@@ -260,10 +272,11 @@ class API_Handler {
             }
         }
 
-        fun getImageFromUrl(url: String, imageView: ImageView, token: String) {
+        fun getImageFromUrl(url: String, imageView: ImageView, bearer_token: String) {
+            Log.d("Debug", "Getting image from $url with token: $bearer_token")
             val request = Request.Builder()
                 .url(url)
-                .header("Authorization", "Bearer $token")
+                .header("Authorization", "Bearer $bearer_token")
                 .build()
             val client = OkHttpClient()
             client.newCall(request).enqueue(object : Callback {
@@ -276,7 +289,7 @@ class API_Handler {
                     val bitmap = BitmapFactory.decodeStream(inputStream)
                     imageView.post {
                         imageView.setImageBitmap(bitmap)
-                        imageView.scaleType = ImageView.ScaleType.CENTER_INSIDE
+                        imageView.scaleType = ImageView.ScaleType.CENTER_CROP
                     }
                 }
             })
@@ -286,10 +299,14 @@ class API_Handler {
             Log.d("Debug_API", "Submitting GET request to $url")
             val get_callable = Callable {
                 val responseBody: String = _get(url, bearer_token) as String
-                //Log.d("Debug", "Inside get_returnfuture, responseBody is: $responseBody")
+                Log.d("Debug", "Inside get_returnfuture, responseBody is: $responseBody")
 
                 if (responseBody.isEmpty()) {
                     return@Callable mapOf()
+                }
+                if (responseBody.uppercase() == "UNAUTHORIZED") {
+                    //RIP Unauthorized lol
+                    return@Callable mapOf("message" to "Unauthorized -- Unknown Error.\n Try force-closing the app and re-opening it")
                 }
 
                 val mapper = jacksonObjectMapper()

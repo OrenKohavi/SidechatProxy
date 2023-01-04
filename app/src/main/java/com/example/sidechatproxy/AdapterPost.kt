@@ -47,6 +47,9 @@ class AdapterPost(
 
         bind_buttons(holder, context)
 
+        holder.image_cardview.invalidate()
+        holder.image_cardview.requestLayout()
+
         //Parse Date
         var dateString: String
         try {

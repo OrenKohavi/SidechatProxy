@@ -16,6 +16,7 @@ class SetupEmail : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.layout_setup_email)
+        Log.d("Debug", "SetupEmail created")
         val continueButton: Button = findViewById(R.id.email_continue_button)
         val emailField: EditText = findViewById(R.id.email_field)
 

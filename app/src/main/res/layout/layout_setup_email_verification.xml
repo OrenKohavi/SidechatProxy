@@ -14,10 +14,10 @@
         android:id="@+id/email_waiting_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/email_waiting_text"
         android:gravity="center"
+        android:text="@string/email_waiting_text"
+        android:textColor="?android:attr/textColorPrimary"
         android:textSize="40sp"
-        android:textColor="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
@@ -34,5 +34,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/email_waiting_text"
         app:layout_constraintVertical_bias="0.5" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/email_waiting_subtext"
+        android:textSize="22sp"
+        android:gravity="center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/email_waiting_text" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

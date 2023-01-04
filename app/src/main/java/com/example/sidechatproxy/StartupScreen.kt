@@ -46,7 +46,7 @@ class StartupScreen : AppCompatActivity() {
                 token = longterm_get("group_id")
                 if (token == null) {
                     //If it's still null, setup needs to be re-done
-                    show_dialog(startup_activity_context, "Incomplete Setup", "Re-Doing Setup Process")
+                    //show_dialog(startup_activity_context, "Incomplete Setup", "Re-Doing Setup Process")
                     next_screen = SetupPhone::class.java
                     loading_complete.set(true)
                     return@Runnable

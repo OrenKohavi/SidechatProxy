@@ -15,7 +15,7 @@
         android:layout_height="wrap_content"
         android:text="@string/phone_descriptor"
         android:textSize="18sp"
-        android:textColor="@color/black"
+        android:textColor="?android:attr/textColorPrimary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
@@ -36,8 +36,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/phone_descriptor_textview"
-        tools:ignore="TextContrastCheck" />
+        app:layout_constraintTop_toBottomOf="@+id/phone_descriptor_textview" />
 
     <Button
         android:id="@+id/phonenumber_continue_button"

@@ -177,7 +177,7 @@ class API_Handler {
                 Log.d("Debug", "Bad Token!")
                 throw APIException(response.toString())
             } else {
-                token = _token as String
+                token = _token
                 longterm_put("token", token!!)
                 Log.d("Debug_API", "Stored token into memory and longterm")
                 //Need to register device token

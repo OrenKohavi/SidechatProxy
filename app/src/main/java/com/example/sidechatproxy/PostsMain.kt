@@ -2,18 +2,16 @@ package com.example.sidechatproxy
 
 import android.content.Intent
 import android.graphics.Color.parseColor
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.Window
 import android.view.WindowManager
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
-import com.example.sidechatproxy.MyFragmentStateAdapter.Companion.page_to_category
+import com.example.sidechatproxy.PostsStateAdapter.Companion.page_to_category
 import com.example.sidechatproxy.StartupScreen.Companion.group_id
 import com.example.sidechatproxy.StartupScreen.Companion.latest_errmsg
 import com.example.sidechatproxy.StartupScreen.Companion.memory_posts
@@ -24,7 +22,7 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 
 
-class MyFragmentStateAdapter(fragment: FragmentActivity) : FragmentStateAdapter(fragment) {
+class PostsStateAdapter(fragment: FragmentActivity) : FragmentStateAdapter(fragment) {
     companion object {
         val page_to_category: Map<Int, String> = mapOf(0 to "hot", 1 to "recent", 2 to "top")
     }
@@ -71,7 +69,7 @@ class PostsMain : AppCompatActivity() {
         val tabLayout = findViewById<TabLayout>(R.id.tabs)
         val viewPager = findViewById<ViewPager2>(R.id.view_pager)
 
-        val adapter = MyFragmentStateAdapter(this)
+        val adapter = PostsStateAdapter(this)
         viewPager.adapter = adapter
 
         TabLayoutMediator(

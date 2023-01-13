@@ -30,4 +30,5 @@
     <string name="comment_button_alt_text">Comment</string>
     <string name="dm_button_alt_text">Direct Message</string>
     <string name="faq_description">This is a sidechat clone for Android\nI got sick of not being able to participate in campus drama, so I made this app!\nFor any questions or concerns, contact oren_kohavi@brown.edu</string>
+    <string name="reply_button">Reply</string>
 </resources>

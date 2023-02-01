@@ -54,12 +54,15 @@ class AdapterPost(
         var dateString: String
         try {
             //Time stuff is fucky, so just put it all in a try/catch
-            val dateFormat = SimpleDateFormat("yyyy-mm-dd'T'hh:mm:ss.SSS'Z'", Locale.US)
-            dateFormat.timeZone = TimeZone.getTimeZone("GMT");
+            Log.d("Debug", "Original Time is: $created_at")
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss.SSS'Z'", Locale.US)
+            dateFormat.timeZone = TimeZone.getTimeZone("GMT")
             //Log.d("Debug", "Current timezone is: " + TimeZone.getDefault())
             val postedTime = dateFormat.parse(created_at)!!
+            Log.d("Debug", "Posted Time is: $postedTime")
             val time = postedTime.time
             val now = System.currentTimeMillis()
+            Log.d("Debug", "Now Time is: $now")
             val ago = DateUtils.getRelativeTimeSpanString(time, now, DateUtils.MINUTE_IN_MILLIS, 0x00080000) //Flag is FORMAT_ABBREV_ALL
             dateString = ago as String
         } catch (e : Exception) {

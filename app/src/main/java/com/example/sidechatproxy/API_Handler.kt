@@ -289,7 +289,7 @@ class API_Handler {
                     val bitmap = BitmapFactory.decodeStream(inputStream)
                     imageView.post {
                         imageView.setImageBitmap(bitmap)
-                        imageView.scaleType = ImageView.ScaleType.CENTER_CROP
+                        imageView.scaleType = ImageView.ScaleType.CENTER_INSIDE
                     }
                 }
             })

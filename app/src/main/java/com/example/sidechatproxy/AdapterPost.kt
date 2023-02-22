@@ -28,6 +28,7 @@ class AdapterPost(
     private var postList:List<Post>,
     val category: PostType
 ) : RecyclerView.Adapter<AdapterPost.HolderPost>() {
+    var loading_disabled: Boolean = category != PostType.Hot
     var needs_loading: Boolean = false
     var mRecyclerView: RecyclerView? = null
 

@@ -70,7 +70,7 @@ class fragment_post_list : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
-                if (adapterPost.needs_loading) {
+                if (adapterPost.loading_disabled || adapterPost.needs_loading) {
                     return
                 }
                 val layoutManager = LinearLayoutManager::class.java.cast(recyclerView.layoutManager)

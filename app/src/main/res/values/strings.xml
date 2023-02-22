@@ -17,7 +17,7 @@
     <string name="email_text">Finally, enter your .edu email address</string>
     <string name="email_continue_button">Continue</string>
     <string name="email_waiting_text">A confirmation link has been sent to your email.</string>
-    <string name="email_waiting_subtext">Note that this might take up to 10 minutes, and make sure to check your spam folder</string>
+    <string name="email_waiting_subtext">Note that this might take up to 10 minutes (yes, really, don\'t lose hope) and make sure to check your spam folder\n\nThe app is somewhat buggy around this point, so if it crashes just run it again and it should work…</string>
     <string name="get_started_button_text">Get Started</string>
     <string name="about_button_label">About This App</string>
     <string name="verson_number">V0.2</string>

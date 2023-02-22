@@ -110,7 +110,7 @@ class fragment_post_list : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         mainHandler.postDelayed(object : Runnable {
             @SuppressLint("NotifyDataSetChanged")
             override fun run() {
-                val new_post_list = parse_posts_from_future(post_getter_future, adapterPost.category)
+                parse_posts_from_future(post_getter_future, adapterPost.category)
                 Log.d("Debug", "Done Refreshing")
                 adapterPost.updatePostList(memory_posts[adapterPost.category.toString()]!!)
                 swr.isRefreshing = false

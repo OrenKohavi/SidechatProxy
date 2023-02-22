@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace 'com.example.sidechatproxy'
+    namespace 'com.orenkohavi.sidechatproxy'
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.example.sidechatproxy"
+        applicationId "com.orenkohavi.sidechatproxy"
         minSdk 26
         targetSdk 33
         versionCode 2

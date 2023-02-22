@@ -24,13 +24,13 @@ import com.google.android.material.tabs.TabLayoutMediator
 
 class PostsStateAdapter(fragment: FragmentActivity) : FragmentStateAdapter(fragment) {
     companion object {
-        val page_to_category: Map<Int, String> = mapOf(0 to "hot", 1 to "recent", 2 to "top")
+        val page_to_category: Map<Int, PostType> = mapOf(0 to PostType.Hot, 1 to PostType.New, 2 to PostType.Top)
     }
 
     override fun getItemCount() = 3 //Hardcoded 3 pages (Hot, New, Top)
 
     override fun createFragment(position: Int): Fragment {
-        val category: String = page_to_category[position] ?: throw IllegalStateException("Page position was $position -- Illegal!")
+        val category: PostType = page_to_category[position] ?: throw IllegalStateException("Page position was $position -- Illegal!")
         return fragment_post_list.newInstance(category)
     }
 }
@@ -42,6 +42,7 @@ class PostsMain : AppCompatActivity() {
         val window: Window = this.window
         // add FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS flag to the window
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        memory_strings["cursor"] = ""
         if (memory_strings["group_color"]?.length != 7) {
             //Basic sanity check for the right format: #XXXXXX
             //If not, just set it to grey or something
@@ -75,7 +76,7 @@ class PostsMain : AppCompatActivity() {
         TabLayoutMediator(
             tabLayout, viewPager
         ) { tab, position ->
-            tab.text = page_to_category.getOrDefault(position, "Unknown").replaceFirstChar { it.uppercaseChar() }
+            tab.text = page_to_category.getOrDefault(position, "Unknown").toString().replaceFirstChar { it.uppercaseChar() }
         }.attach()
 
     }

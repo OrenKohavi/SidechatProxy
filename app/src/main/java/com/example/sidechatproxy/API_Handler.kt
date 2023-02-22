@@ -44,6 +44,15 @@ class API_Handler {
             Log.d("Debug", "Longterm Stored group_id: $group_id")
         }
 
+        fun background_fetch_post_images(type: PostType) {
+            val posts = memory_posts[type.as_string()]!!
+            for (post in posts) {
+                if (post.image_url != null) {
+                    //TODO use a cache and prefetch the images that are not already in that cache
+                }
+            }
+        }
+
         fun get_user_and_group() {
             Log.d("Debug_API", "updating user and group")
             val response_future = get_returnfuture(
@@ -65,8 +74,17 @@ class API_Handler {
             parse_user(user)
         }
 
+        fun get_posts_with_cursor(cursor: String, type: PostType) {
+            Log.d("Debug", "Getting posts with cursor $cursor")
+            val group_id = group_id!!
+            val response_future = get_returnfuture(
+                "https://api.sidechat.lol/v1/posts?cursor=$cursor&group_id=$group_id&type=${type.as_string()}",
+                token
+            )
+            parse_posts_from_future(response_future, type)
+        }
 
-        fun get_all_posts() {
+        fun get_all_post_categories() {
             Log.d("Debug", "Getting all posts")
             val group_id = group_id!!
             val token = (token ?: throw APIException("Token is null! Memory: $memory_strings | $memory_posts"))
@@ -75,13 +93,13 @@ class API_Handler {
             val new_future = get_returnfuture("https://api.sidechat.lol/v1/posts?group_id=$group_id&type=recent", token)
             val top_future = get_returnfuture("https://api.sidechat.lol/v1/posts?group_id=$group_id&type=top", token)
             //Hopefully all three GET requests are running simultaneously here (better than sequentially, but still not ideal)
-            memory_posts["hot"] = get_posts(hot_future)
-            memory_posts["recent"] = get_posts(new_future)
-            memory_posts["top"] = get_posts(top_future)
+            parse_posts_from_future(hot_future, PostType.Hot)
+            parse_posts_from_future(new_future, PostType.New)
+            parse_posts_from_future(top_future, PostType.Top)
             Log.d("Debug", "Finished getting all posts")
         }
 
-        fun get_posts(response_future: FutureTask<Map<String, Any>>): List<Post> {
+        fun parse_posts_from_future(response_future: FutureTask<Map<String, Any>>, type: PostType) {
             val response = response_future.get()
             val post_list = (response["posts"] ?: throw APIException("Post List is Null! Response: $response ||| $memory_strings"))
             if (post_list !is ArrayList<*>) {
@@ -97,7 +115,6 @@ class API_Handler {
                 val num_upvotes: Number = post["vote_total"] as Number
                 val num_comments: Number = post["comment_count"] as Number
                 val created_at: String = post["created_at"] as String
-                //TODO maybe parse the time here?
                 val image_url: String? = if ((post["assets"] as List<*>).isNotEmpty()) {
                     ((post["assets"] as List<*>)[0] as Map<*,*>).getOrDefault("url", null) as String?
                 } else {
@@ -105,7 +122,18 @@ class API_Handler {
                 }
                 new_post_list.add(Post(body, num_upvotes, image_url, num_comments, created_at))
             }
-            return new_post_list
+            memory_strings["cursor_${type.as_string()}"] = response["cursor"] as String
+            val old_posts = memory_posts[type.as_string()]
+            if (old_posts == null || old_posts.isEmpty()){
+                //Log.d("Debug", "Old posts is null or empty, setting to new posts")
+                memory_posts[type.as_string()] = new_post_list
+            } else {
+                //Log.d("Debug", "Old posts is not null or empty, adding to old posts")
+                //Log.d("Debug", "Old posts size: ${old_posts.size}")
+                memory_posts[type.as_string()] = old_posts + new_post_list
+                //Log.d("Debug", "New posts size: ${new_post_list.size}")
+                //Log.d("Debug", "memory_posts size: ${memory_posts[type.as_string()]!!.size}")
+            }
         }
 
         fun check_email_verification(): Boolean {

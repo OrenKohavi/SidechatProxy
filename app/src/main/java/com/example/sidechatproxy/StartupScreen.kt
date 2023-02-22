@@ -8,7 +8,7 @@ import android.util.Log
 import android.widget.Button
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import com.example.sidechatproxy.API_Handler.Companion.get_all_posts
+import com.example.sidechatproxy.API_Handler.Companion.get_all_post_categories
 import com.example.sidechatproxy.API_Handler.Companion.get_user_and_group
 import com.example.sidechatproxy.LoadingScreen.Companion.next_screen
 import com.example.sidechatproxy.LoadingScreen.Companion.setup_loading_screen
@@ -68,7 +68,7 @@ class StartupScreen : AppCompatActivity() {
             }
             if (memory_posts["hot"] == null || memory_posts["recent"] == null || memory_posts["top"] == null) {
                 Log.d("Debug", "Getting posts in runnable")
-                get_all_posts()
+                get_all_post_categories()
             }
             //TODO Go through the posts, and get all the images from all the posts before finishing loading!
             loading_complete.set(true)

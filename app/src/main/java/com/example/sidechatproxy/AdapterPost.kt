@@ -13,7 +13,11 @@ import android.widget.Toast
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import com.example.sidechatproxy.API_Handler.Companion.background_fetch_post_images
 import com.example.sidechatproxy.API_Handler.Companion.getImageFromUrl
+import com.example.sidechatproxy.API_Handler.Companion.get_posts_with_cursor
+import com.example.sidechatproxy.StartupScreen.Companion.memory_posts
+import com.example.sidechatproxy.StartupScreen.Companion.memory_strings
 import com.example.sidechatproxy.StartupScreen.Companion.token
 import java.text.SimpleDateFormat
 import java.util.*
@@ -22,12 +26,19 @@ import java.util.*
 class AdapterPost(
     private val context:Context,
     private var postList:List<Post>,
-    val category: String
+    val category: PostType
 ) : RecyclerView.Adapter<AdapterPost.HolderPost>() {
+    var needs_loading: Boolean = false
+    var mRecyclerView: RecyclerView? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HolderPost {
         val view = LayoutInflater.from(context).inflate(R.layout.single_post, parent, false)
         return HolderPost(view)
+    }
+
+    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+        super.onAttachedToRecyclerView(recyclerView)
+        mRecyclerView = recyclerView
     }
 
     override fun onBindViewHolder(holder: HolderPost, position: Int) {
@@ -54,15 +65,15 @@ class AdapterPost(
         var dateString: String
         try {
             //Time stuff is fucky, so just put it all in a try/catch
-            Log.d("Debug", "Original Time is: $created_at")
+            //Log.d("Debug", "Original Time is: $created_at")
             val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss.SSS'Z'", Locale.US)
             dateFormat.timeZone = TimeZone.getTimeZone("GMT")
             //Log.d("Debug", "Current timezone is: " + TimeZone.getDefault())
             val postedTime = dateFormat.parse(created_at)!!
-            Log.d("Debug", "Posted Time is: $postedTime")
+            //Log.d("Debug", "Posted Time is: $postedTime")
             val time = postedTime.time
             val now = System.currentTimeMillis()
-            Log.d("Debug", "Now Time is: $now")
+            //Log.d("Debug", "Now Time is: $now")
             val ago = DateUtils.getRelativeTimeSpanString(time, now, DateUtils.MINUTE_IN_MILLIS, 0x00080000) //Flag is FORMAT_ABBREV_ALL
             dateString = ago as String
         } catch (e : Exception) {
@@ -91,6 +102,27 @@ class AdapterPost(
 
     fun updatePostList(new_list: List<Post>) {
         postList = new_list
+    }
+
+    fun loadMorePosts() {
+        val cursor: String? = memory_strings["cursor_${category.as_string()}"]
+        if (cursor != null) {
+            Log.d("Debug", "Loading more posts with cursor: $cursor")
+        } else {
+            Log.d("Debug", "Cursor is Blank!")
+            Toast.makeText(context, "Error fetching additional posts", Toast.LENGTH_SHORT).show()
+            return
+        }
+        val old_dataset_size = this.itemCount
+        get_posts_with_cursor(cursor, category)
+        this.postList = memory_posts[category.as_string()]!!
+        Log.d("Debug", "Old dataset size: $old_dataset_size")
+        Log.d("Debug", "New dataset size: ${this.itemCount}")
+        mRecyclerView?.post {
+            this.notifyItemRangeInserted(old_dataset_size, this.itemCount)
+            background_fetch_post_images(category)
+            this.needs_loading = false
+        }
     }
 
     private fun bind_buttons(holder: HolderPost, ctx: Context){

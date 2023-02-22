@@ -1,6 +1,8 @@
 package com.example.sidechatproxy
 
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
 import android.text.format.DateUtils
 import android.util.Log
 import android.view.LayoutInflater
@@ -127,18 +129,19 @@ class AdapterPost(
     }
 
     private fun bind_buttons(holder: HolderPost, ctx: Context){
+        var some_toast: Toast? = null
         holder.upvote_button.setOnClickListener {
-            Toast.makeText(ctx, "Upvote Not Supported Yet", Toast.LENGTH_SHORT).show()
+            some_toast = Toast.makeText(ctx, "Upvote Not Supported Yet", Toast.LENGTH_SHORT)
         }
         holder.downvote_button.setOnClickListener {
-            Toast.makeText(ctx, "Downvote Not Supported Yet", Toast.LENGTH_SHORT).show()
+            some_toast = Toast.makeText(ctx, "Downvote Not Supported Yet", Toast.LENGTH_SHORT)
         }
         holder.comment_button.setOnClickListener {
-            Toast.makeText(ctx, "Comments Not Supported Yet", Toast.LENGTH_SHORT).show()
+            some_toast = Toast.makeText(ctx, "Comments Not Supported Yet", Toast.LENGTH_SHORT)
         }
-        //holder.dm_button.setOnClickListener {
-        //    Toast.makeText(ctx, "DMs Not Supported Yet", Toast.LENGTH_SHORT).show()
-        //}
+        some_toast?.show()
+        val handler = Handler(Looper.getMainLooper())
+        handler.postDelayed(Runnable { some_toast?.cancel() }, 750)
     }
 
     inner class HolderPost(itemView: View) : ViewHolder(itemView) {

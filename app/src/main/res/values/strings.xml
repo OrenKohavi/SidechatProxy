@@ -31,4 +31,6 @@
     <string name="dm_button_alt_text">Direct Message</string>
     <string name="faq_description">This is a sidechat clone for Android\nI got sick of not being able to participate in campus drama, so I made this app!\nFor any questions, concerns, bug reports, or feature requests, contact oren_kohavi@brown.edu</string>
     <string name="reply_button">Reply</string>
+    <string name="known_bugs">Known Bugs:\n-Infinite Scroll does not work for \'New\' and \'Top\' tabs\n-Images will sometimes pop-in causing scrolling weirdness\n-App crashes when internet connection is unstable</string>
+    <string name="upcoming_features">Upcoming Features:\n-Upvote/Downvote Support\n-Comment support\n-Ability to create posts\n-Viewable polls\n\nRequest Features by Emailing Me!</string>
 </resources>

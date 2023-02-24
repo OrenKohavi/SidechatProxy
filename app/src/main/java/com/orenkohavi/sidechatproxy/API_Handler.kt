@@ -325,6 +325,7 @@ class API_Handler {
 
         fun get_returnfuture(url: String, bearer_token: String?): FutureTask<Map<String, Any>> {
             Log.d("Debug_API", "Submitting GET request to $url")
+            Log.d("Debug_API", "GET request using bearer token: $bearer_token")
             val get_callable = Callable {
                 val responseBody: String = _get(url, bearer_token) as String
                 Log.d("Debug", "Inside get_returnfuture, responseBody is: $responseBody")

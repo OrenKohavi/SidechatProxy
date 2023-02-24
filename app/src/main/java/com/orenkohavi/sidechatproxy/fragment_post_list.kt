@@ -103,17 +103,17 @@ class fragment_post_list : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     override fun onRefresh() {
         Log.d("Debug", "Refreshing Posts w/ swipeup")
         val post_getter_future = API_Handler.get_returnfuture(
-            "https://api.sidechat.lol/v1/posts?group_id=$group_id&type=${adapterPost.category}",
+            "https://api.sidechat.lol/v1/posts?group_id=$group_id&type=${adapterPost.category.as_string().lowercase()}",
             token
         )
-        post_getter_future.run()
+        //post_getter_future.run()
         val mainHandler = Handler(Looper.getMainLooper())
         mainHandler.postDelayed(object : Runnable {
             @SuppressLint("NotifyDataSetChanged")
             override fun run() {
                 parse_posts_from_future(post_getter_future, adapterPost.category)
                 Log.d("Debug", "Done Refreshing")
-                adapterPost.updatePostList(memory_posts[adapterPost.category.toString()]!!)
+                adapterPost.updatePostList(memory_posts[adapterPost.category.as_string()]!!)
                 swr.isRefreshing = false
                 adapterPost.notifyDataSetChanged()
             }

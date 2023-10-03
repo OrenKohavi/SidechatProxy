@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/comment_constraintlayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <View
+        android:id="@+id/background"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="?android:attr/colorBackground"
+        app:layout_constraintBottom_toBottomOf="@+id/comment_constraintlayout"
+        app:layout_constraintEnd_toEndOf="@+id/comment_constraintlayout"
+        app:layout_constraintStart_toStartOf="@+id/comment_constraintlayout"
+        app:layout_constraintTop_toTopOf="@+id/comment_constraintlayout" />
+
+    <TextView
+        android:id="@+id/comment_body"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="8dp"
+        android:layout_marginTop="8dp"
+        android:text="Comment Placeholder Lorem Ipsum Dolor Whatever Latin Stuff"
+        android:textColor="?android:attr/textColorPrimary"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/buttons_guideline"/>
+
+    <TextView
+        android:id="@+id/comment_info"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="Some Time Ago"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/downvote_button"
+        app:layout_constraintTop_toTopOf="@+id/buttons_guideline" />
+
+    <ImageButton
+        android:id="@+id/upvote_button"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginBottom="2dp"
+        android:contentDescription="@string/upvote_button_alt_text"
+        android:minWidth="48dp"
+        android:paddingHorizontal="8sp"
+        android:paddingVertical="12sp"
+        android:src="@drawable/upvote_arrow"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/buttons_guideline" />
+
+
+    <ImageButton
+        android:id="@+id/downvote_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="2dp"
+        android:contentDescription="@string/downvote_button_alt_text"
+        android:minWidth="48dp"
+        android:paddingHorizontal="4sp"
+        android:paddingVertical="12sp"
+        android:src="@drawable/downvote_arrow"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/vote_counter"
+        app:layout_constraintTop_toTopOf="@+id/buttons_guideline"
+        app:layout_constraintVertical_bias="0.45" />
+
+
+    <TextView
+        android:id="@+id/vote_counter"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="2dp"
+        android:gravity="center"
+        android:minWidth="32dp"
+        android:text="69"
+        android:textColor="?android:attr/textColorPrimary"
+        android:textSize="22sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/buttons_guideline"
+        app:layout_constraintStart_toEndOf="@id/upvote_button"
+        tools:layout_editor_absoluteX="52dp" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/buttons_guideline"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_end="54dp" />
+
+    <Button
+        android:id="@+id/reply_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="10dp"
+        android:backgroundTint="?android:attr/colorBackground"
+        android:text="@string/reply_button"
+        android:textColor="?android:attr/textColorPrimary"
+        android:textSize="18sp"
+        style="?android:attr/borderlessButtonStyle"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/buttons_guideline" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

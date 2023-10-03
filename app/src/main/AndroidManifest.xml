@@ -11,13 +11,12 @@
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
-        android:supportsRtl="true"
+        android:supportsRtl="false"
         android:theme="@style/Theme.PinkTheme"
         tools:targetApi="33">
 
         <activity
-            android:name=".StartupScreen"
+            android:name="com.orenkohavi.sidechatproxy.StartupScreen"
             android:theme="@style/Theme.PinkThemeActionBar"
             android:exported="true">
             <intent-filter>
@@ -26,17 +25,17 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".ErrorDisplay" android:parentActivityName=".StartupScreen"/>
-        <activity android:name=".SetupPhone" android:parentActivityName=".StartupScreen"/>
-        <activity android:name=".SetupTwoFactor" android:parentActivityName=".SetupPhone"/>
-        <activity android:name=".SetupAge" android:parentActivityName=".SetupTwoFactor"/>
-        <activity android:name=".SetupEmail" android:parentActivityName=".SetupAge"/>
-        <activity android:name=".SetupWaitForEmailVerification" android:parentActivityName=".SetupEmail"/>
+        <activity android:name="com.orenkohavi.sidechatproxy.ErrorDisplay" android:parentActivityName="com.orenkohavi.sidechatproxy.StartupScreen"/>
+        <activity android:name="com.orenkohavi.sidechatproxy.SetupPhone" android:parentActivityName="com.orenkohavi.sidechatproxy.StartupScreen"/>
+        <activity android:name="com.orenkohavi.sidechatproxy.SetupTwoFactor" android:parentActivityName="com.orenkohavi.sidechatproxy.SetupPhone"/>
+        <activity android:name="com.orenkohavi.sidechatproxy.SetupAge" android:parentActivityName="com.orenkohavi.sidechatproxy.SetupTwoFactor"/>
+        <activity android:name="com.orenkohavi.sidechatproxy.SetupEmail" android:parentActivityName="com.orenkohavi.sidechatproxy.SetupAge"/>
+        <activity android:name="com.orenkohavi.sidechatproxy.SetupWaitForEmailVerification" android:parentActivityName="com.orenkohavi.sidechatproxy.SetupEmail"/>
 
-        <activity android:name=".LoadingScreen" android:noHistory="true"/>
+        <activity android:name="com.orenkohavi.sidechatproxy.LoadingScreen" android:noHistory="true"/>
 
-        <activity android:name=".PostsMain" android:theme="@style/Theme.NeutralTheme"/>
-        <activity android:name=".FAQ"/>
+        <activity android:name="com.orenkohavi.sidechatproxy.PostsMain" android:theme="@style/Theme.NeutralTheme"/>
+        <activity android:name="com.orenkohavi.sidechatproxy.FAQ"/>
     </application>
 
 </manifest>
